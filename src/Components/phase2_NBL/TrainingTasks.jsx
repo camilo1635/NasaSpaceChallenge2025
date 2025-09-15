@@ -8,37 +8,40 @@ import { Html, useGLTF } from '@react-three/drei'
 /* 🔹 COMPONENTES PARA PARTES DEL SATÉLITE */
 function SatelliteBody(props) {
   const { scene } = useGLTF('/models/sat01_body_satellite.glb')
-  return <primitive object={scene.clone()} scale={0.15} rotation={[0, Math.PI / 2, 0]} />
+  return <primitive object={scene.clone()} {...props} />
 }
 
 function Antenna(props) {
   const { scene } = useGLTF('/models/antenna.glb')
-  return <primitive object={scene.clone()} scale={0.1} rotation={[0, Math.PI / 2, 0]} />
+  return <primitive object={scene.clone()} {...props} />
 }
 
 function DockingRing(props) {
   const { scene } = useGLTF('/models/svrs_1.glb')
-  return <primitive object={scene.clone()} scale={0.15} rotation={[0, Math.PI / 2, 0]}/>
-}
-
-function SolarPanel(props) {
-  const { scene } = useGLTF('/models/solar_panel.glb')
-  return <primitive object={scene.clone()} scale={0.03} rotation={[0, Math.PI / 2, 0]} />
+  return <primitive object={scene.clone()} {...props} />
 }
 
 /* 🔹 BLOQUE NBL (pieza del satélite) */
-function NBLBlock({ blockData, onGrab, onRelease, isGrabbed, grabPosition }) {
+function NBLBlock({ blockData, onGrab, onRelease, isGrabbed, grabPosition, isConnected, finalPosition }) {
   const blockRef = useRef()
   const { camera } = useThree()
   const [isNearby, setIsNearby] = useState(false)
-  const [isPlaced, setIsPlaced] = useState(false)
 
   useFrame(() => {
-    if (!blockRef.current || isPlaced) return
+    if (!blockRef.current) return
 
+    // Si está conectado, mantenerlo en su posición final
+    if (isConnected && finalPosition) {
+      blockRef.current.position.copy(finalPosition)
+      blockRef.current.rotation.set(0, Math.PI / 2, 0) // Orientación consistente
+      return
+    }
+
+    // Si está siendo agarrado
     if (isGrabbed && grabPosition) {
       blockRef.current.position.copy(grabPosition)
-    } else {
+    } else if (!isConnected) {
+      // Animación flotante solo si no está conectado
       blockRef.current.position.y = blockData.position[1] + Math.sin(Date.now() * 0.003 + blockData.id) * 0.1
       blockRef.current.rotation.y += 0.005
     }
@@ -52,7 +55,7 @@ function NBLBlock({ blockData, onGrab, onRelease, isGrabbed, grabPosition }) {
 
   useEffect(() => {
     const handleKeyPress = (e) => {
-      if (e.code === 'KeyE' && isNearby && !isGrabbed && !isPlaced) {
+      if (e.code === 'KeyE' && isNearby && !isGrabbed && !isConnected) {
         e.preventDefault()
         onGrab(blockData.id)
       }
@@ -71,21 +74,19 @@ function NBLBlock({ blockData, onGrab, onRelease, isGrabbed, grabPosition }) {
       window.removeEventListener('keydown', handleKeyPress)
       window.removeEventListener('keydown', handleRelease)
     }
-  }, [isNearby, isGrabbed, blockData.id, onGrab, onRelease])
-
-  if (isPlaced && !isGrabbed) return null
+  }, [isNearby, isGrabbed, isConnected, blockData.id, onGrab, onRelease])
 
   /* 🔹 RENDERIZADO DEL MODELO SEGÚN EL TIPO */
   const renderBlockGeometry = () => {
+    const baseScale = 0.15 // Escala base consistente
+    
     switch (blockData.type) {
       case 'base':
-        return <SatelliteBody scale={0.5} />
+        return <SatelliteBody scale={baseScale} rotation={[0, Math.PI / 2, 0]} />
       case 'support':
-        return <Antenna scale={0.6} />
+        return <Antenna scale={baseScale * 0.8} rotation={[0, Math.PI / 2, 0]} />
       case 'connector':
-        return <DockingRing scale={0.6} />
-      case 'panel':
-        return <SolarPanel scale={0.4} />
+        return <DockingRing scale={baseScale} rotation={[0, Math.PI / 2, 0]} />
       default:
         return <mesh><boxGeometry args={[1, 1, 1]} /></mesh>
     }
@@ -97,7 +98,7 @@ function NBLBlock({ blockData, onGrab, onRelease, isGrabbed, grabPosition }) {
         {renderBlockGeometry()}
       </group>
 
-      {isNearby && !isGrabbed && !isPlaced && (
+      {isNearby && !isGrabbed && !isConnected && (
         <Html position={[blockData.position[0], blockData.position[1] + 2.5, blockData.position[2]]} center>
           <div style={{
             background: 'rgba(0,50,100,0.9)',
@@ -114,11 +115,6 @@ function NBLBlock({ blockData, onGrab, onRelease, isGrabbed, grabPosition }) {
             <div style={{ fontSize: '11px', opacity: 0.9 }}>
               Presiona <span style={{color: '#00ffff'}}>E</span> para agarrar
             </div>
-            {isGrabbed && (
-              <div style={{ fontSize: '11px', opacity: 0.9 }}>
-                Presiona <span style={{color: '#00ff00'}}>Q</span> para soltar
-              </div>
-            )}
           </div>
           <style>{`
             @keyframes pulse {
@@ -126,6 +122,21 @@ function NBLBlock({ blockData, onGrab, onRelease, isGrabbed, grabPosition }) {
               50% { transform: scale(1.08); opacity: 0.8; }
             }
           `}</style>
+        </Html>
+      )}
+
+      {isGrabbed && (
+        <Html position={[grabPosition?.x || 0, (grabPosition?.y || 0) + 1, grabPosition?.z || 0]} center>
+          <div style={{
+            background: 'rgba(0,100,50,0.9)',
+            color: '#fff',
+            padding: '8px 12px',
+            borderRadius: '8px',
+            fontSize: '12px',
+            border: '2px solid #00ff00'
+          }}>
+            Presiona <span style={{color: '#00ff00'}}>Q</span> para soltar
+          </div>
         </Html>
       )}
     </group>
@@ -143,13 +154,14 @@ function ConnectionPoint({ position, isActive, expectedType, onConnect }) {
 
   return (
     <mesh ref={pointRef} position={position} onClick={() => onConnect && onConnect()}>
-      <sphereGeometry args={[0.3]} />
+      <sphereGeometry args={[0.5]} />
       <meshStandardMaterial 
         color={isActive ? "#00ff00" : "#666666"}
         emissive={isActive ? "#00ff00" : "#333333"}
-        emissiveIntensity={isActive ? 0.5 : 0.1}
+        emissiveIntensity={isActive ? 0.8 : 0.1}
         transparent
-        opacity={0.8}
+        opacity={isActive ? 0.6 : 0.3}
+        wireframe={isActive}
       />
     </mesh>
   )
@@ -165,18 +177,36 @@ export function TrainingTasks() {
   const [showCompletion, setShowCompletion] = useState(false)
   const { camera, gl } = useThree()
 
+  // Solo 3 piezas ahora (sin panel solar)
   const blocks = [
     { id: 1, type: 'base', position: [-6, 1, -2], name: 'Cuerpo Principal del Satélite' },
     { id: 2, type: 'support', position: [6, 1, -2], name: 'Antena de Comunicación' },
-    { id: 3, type: 'connector', position: [-6, 1, 4], name: 'Anillo de Acople' },
-    { id: 4, type: 'panel', position: [6, 1, 4], name: 'Panel Solar' }
+    { id: 3, type: 'connector', position: [-6, 1, 4], name: 'Anillo de Acople' }
   ]
 
+  // Posiciones finales ajustadas según la imagen
   const connectionPoints = [
-    { id: 'base-point', position: [0, 1, -3], expectedType: 'base', step: 1 },
-    { id: 'support-point', position: [0, 2.5, -3], expectedType: 'support', step: 2 },
-    { id: 'connector-point', position: [-1.5, 3.5, -3], expectedType: 'connector', step: 3 },
-    { id: 'panel-point', position: [1.5, 4, -3], expectedType: 'panel', step: 4 }
+    { 
+      id: 'base-point', 
+      position: [0, 1, -3], 
+      finalPosition: [0, 1, -3], // Centro base
+      expectedType: 'base', 
+      step: 1 
+    },
+    { 
+      id: 'support-point', 
+      position: [0, 2.5, -3], 
+      finalPosition: [0, 3.2, -3], // Antena arriba del cuerpo
+      expectedType: 'support', 
+      step: 2 
+    },
+    { 
+      id: 'connector-point', 
+      position: [0, 1, -1.5], 
+      finalPosition: [0, 1, -2], // Anillo central
+      expectedType: 'connector', 
+      step: 3 
+    }
   ]
 
   useEffect(() => {
@@ -208,15 +238,19 @@ export function TrainingTasks() {
     const validPoint = connectionPoints.find(point => 
       point.expectedType === block.type && 
       point.step === currentStep &&
-      position.distanceTo(new THREE.Vector3(...point.position)) < 2
+      position.distanceTo(new THREE.Vector3(...point.position)) < 3.5 // Aumentado el rango de detección
     )
 
     if (validPoint) {
-      setConnectedBlocks(prev => [...prev, { blockId, pointId: validPoint.id }])
+      setConnectedBlocks(prev => [...prev, { 
+        blockId, 
+        pointId: validPoint.id,
+        finalPosition: new THREE.Vector3(...validPoint.finalPosition)
+      }])
       setCurrentStep(prev => prev + 1)
 
-
-      if (currentStep >= 4) {
+      // Ahora son solo 3 pasos
+      if (currentStep >= 3) {
         setShowCompletion(true)
         setTimeout(() => {
           dispatch({ type: 'SET_PHASE', payload: 'iss' })
@@ -232,26 +266,30 @@ export function TrainingTasks() {
 
   const getStepInstructions = () => {
     const instructions = {
-      1: "Coloca el Cuerpo Principal en la base",
-      2: "Conecta la Antena encima del cuerpo",
-      3: "Instala el Anillo de Acople al lado izquierdo", 
-      4: "Monta el Panel Solar en el lado derecho"
+      1: "Coloca el Cuerpo Principal del satélite en la base",
+      2: "Conecta la Antena de Comunicación en la parte superior",
+      3: "Instala el Anillo de Acople en la parte frontal"
     }
     return instructions[currentStep] || "¡Entrenamiento completado!"
   }
 
+  // Encontrar la información de conexión para cada bloque
+  const getBlockConnectionInfo = (blockId) => {
+    return connectedBlocks.find(conn => conn.blockId === blockId)
+  }
+
   return (
     <group>
-      {/* Base de construcción */}
-      <mesh position={[0, 2, -3]} castShadow receiveShadow>
-        <boxGeometry args={[3, 0.5, 2]} />
-        <meshStandardMaterial color="#708090" metalness={0.7} roughness={0.3} />
+      {/* Base de construcción - plataforma más visible */}
+      <mesh position={[0, 0.5, -3]} castShadow receiveShadow>
+        <boxGeometry args={[5, 0.2, 3]} />
+        <meshStandardMaterial color="#404040" metalness={0.7} roughness={0.3} />
       </mesh>
 
-      {/* Soporte central */}
-      <mesh position={[0, 0.5, -3]} castShadow receiveShadow>
-        <cylinderGeometry args={[0.5, 0.8, 3]} />
-        <meshStandardMaterial color="#556B2F" metalness={0.6} roughness={0.4} />
+      {/* Zona de ensamblaje visual */}
+      <mesh position={[0, 0.6, -3]}>
+        <ringGeometry args={[2.5, 3, 32]} />
+        <meshBasicMaterial color="#00ffff" transparent opacity={0.2} />
       </mesh>
 
       {connectionPoints.map((point) => (
@@ -263,17 +301,21 @@ export function TrainingTasks() {
         />
       ))}
 
-      {blocks.map((block) => (
-        <NBLBlock
-          key={block.id}
-          blockData={block}
-          onGrab={handleGrabBlock}
-          onRelease={handleReleaseBlock}
-          isGrabbed={grabbedBlock === block.id}
-          grabPosition={grabbedBlock === block.id ? grabbedPosition : null}
-          isConnected={connectedBlocks.some(conn => conn.blockId === block.id)}
-        />
-      ))}
+      {blocks.map((block) => {
+        const connectionInfo = getBlockConnectionInfo(block.id)
+        return (
+          <NBLBlock
+            key={block.id}
+            blockData={block}
+            onGrab={handleGrabBlock}
+            onRelease={handleReleaseBlock}
+            isGrabbed={grabbedBlock === block.id}
+            grabPosition={grabbedBlock === block.id ? grabbedPosition : null}
+            isConnected={!!connectionInfo}
+            finalPosition={connectionInfo?.finalPosition}
+          />
+        )
+      })}
 
       {/* HUD */}
       <Html position={[-8, 4, 0]} center>
@@ -287,28 +329,38 @@ export function TrainingTasks() {
           minWidth: '280px'
         }}>
           <h3 style={{ margin: '0 0 10px', color: '#00ffff' }}>🛰️ ENSAMBLA EL SATÉLITE</h3>
-          <div><strong>Paso {currentStep}/4:</strong></div>
-          <div style={{ fontSize: '13px' }}>{getStepInstructions()}</div>
-          <div style={{ fontSize: '12px', opacity: 0.8 }}>
-            Progreso: {connectedBlocks.length}/4 módulos conectados
+          <div><strong>Paso {currentStep}/3:</strong></div>
+          <div style={{ fontSize: '13px', marginTop: '5px', color: '#ffff00' }}>
+            {getStepInstructions()}
+          </div>
+          <div style={{ fontSize: '12px', opacity: 0.8, marginTop: '10px' }}>
+            Progreso: {connectedBlocks.length}/3 módulos conectados
+          </div>
+          <div style={{ fontSize: '11px', opacity: 0.6, marginTop: '5px' }}>
+            Controles: [E] Agarrar | [Q] Soltar
           </div>
         </div>
       </Html>
 
       {showCompletion && (
-        <Html position={[0, 6, 0]} center>
+        <Html position={[0, 8, -3]} center>
           <div style={{
             background: 'linear-gradient(135deg, rgba(40,167,69,0.95), rgba(0,100,0,0.95))',
             color: '#fff',
-            padding: '25px',
+            padding: '25px 35px',
             borderRadius: '20px',
             textAlign: 'center',
             border: '3px solid #28a745',
-            boxShadow: '0 10px 30px rgba(0,0,0,0.5)'
+            boxShadow: '0 10px 30px rgba(0,0,0,0.5)',
+            transform: 'translateZ(100px)'
           }}>
-            <h2>🎉 ¡SATÉLITE ENSAMBLADO!</h2>
-            <p>Estructura completa: ✅ Cuerpo + Antena + Acople + Panel</p>
-            <p>Iniciando transferencia a la ISS...</p>
+            <h2 style={{ margin: '0 0 15px', fontSize: '24px' }}>🎉 ¡SATÉLITE ENSAMBLADO!</h2>
+            <p style={{ margin: '10px 0', fontSize: '16px' }}>
+              Estructura completa: ✅ Cuerpo + Antena + Anillo de Acople
+            </p>
+            <p style={{ margin: '10px 0', fontSize: '14px', opacity: 0.9 }}>
+              Iniciando transferencia a la ISS...
+            </p>
           </div>
         </Html>
       )}
