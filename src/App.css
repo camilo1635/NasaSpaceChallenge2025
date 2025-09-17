@@ -213,8 +213,8 @@ body {
   width: 100%;
   height: 100%;
   background: rgba(0, 0, 0, 0.8);
-
 }
+
 /* Overlay de transición NBL - Máxima prioridad */
 #nbl-transition-overlay {
   position: fixed !important;
@@ -222,4 +222,239 @@ body {
   left: 0 !important;
   z-index: 999999 !important;
   pointer-events: all !important;
+}
+
+/* ============================================ */
+/* ANIMACIONES DE TRANSICIÓN DE COHETE A LA ISS */
+/* ============================================ */
+
+@keyframes fadeInUp {
+  0% { 
+    opacity: 0; 
+    transform: translateY(50px);
+  }
+  100% { 
+    opacity: 1; 
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+@keyframes countdown {
+  0% { transform: scale(0.5); opacity: 0; }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes earthShrink {
+  0% { 
+    transform: translateX(-50%) scale(1);
+    bottom: -50%;
+  }
+  100% { 
+    transform: translateX(-50%) scale(0.3);
+    bottom: -90%;
+  }
+}
+
+@keyframes rocketLaunch {
+  0% { 
+    transform: translateX(-50%) translateY(0);
+    bottom: 10%;
+  }
+  100% { 
+    transform: translateX(-50%) translateY(-200px);
+    bottom: 50%;
+  }
+}
+
+@keyframes rocketShake {
+  0%, 100% { transform: translateX(-2px); }
+  50% { transform: translateX(2px); }
+}
+
+@keyframes flames {
+  0% { transform: translateX(-50%) scale(1); opacity: 0.8; }
+  100% { transform: translateX(-50%) scale(1.2); opacity: 1; }
+}
+
+@keyframes cloudPass {
+  0% { 
+    transform: translateY(0);
+    opacity: 0.7;
+  }
+  100% { 
+    transform: translateY(200px);
+    opacity: 0;
+  }
+}
+
+@keyframes floatInSpace {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-20px); }
+}
+
+@keyframes progress {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(0); }
+}
+
+@keyframes earthFadeOut {
+  0% { 
+    opacity: 1;
+    transform: translateX(-50%) scale(1);
+  }
+  100% { 
+    opacity: 0.3;
+    transform: translateX(-50%) scale(0.5);
+  }
+}
+
+@keyframes issApproach {
+  0% { 
+    transform: scale(0.5);
+    opacity: 0;
+  }
+  100% { 
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes issGrow {
+  0% { font-size: 20px; }
+  100% { font-size: 150px; }
+}
+
+@keyframes fadeIn {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+@keyframes rocketDock {
+  0% { 
+    bottom: 10%;
+    left: 20%;
+  }
+  100% { 
+    bottom: 45%;
+    left: 45%;
+  }
+}
+
+/* ============================================ */
+/* ANIMACIONES DE TRANSICIÓN AL NBL (AGUA) */
+/* ============================================ */
+
+@keyframes smoothFadeIn {
+  0% { 
+    opacity: 0; 
+    transform: translateY(30px) scale(0.9);
+  }
+  100% { 
+    opacity: 1; 
+    transform: translateY(-20px) scale(1);
+  }
+}
+
+@keyframes glow {
+  0% { 
+    text-shadow: 0 0 30px rgba(40,167,69,0.8), 0 0 60px rgba(40,167,69,0.4);
+  }
+  100% { 
+    text-shadow: 0 0 40px rgba(40,167,69,1), 0 0 80px rgba(40,167,69,0.6);
+  }
+}
+
+@keyframes progressBar {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(0%); }
+}
+
+@keyframes enhancedBubble {
+  0% {
+    transform: translateY(0) scale(0) rotate(0deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-50vh) scale(1.2) rotate(180deg);
+  }
+  90% {
+    opacity: 1;
+    transform: translateY(-90vh) scale(0.8) rotate(300deg);
+  }
+  100% {
+    transform: translateY(-100vh) scale(0) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+@keyframes swimFloat {
+  0%, 100% { 
+    transform: translateY(0px) rotate(0deg); 
+  }
+  25% { 
+    transform: translateY(-8px) rotate(-2deg); 
+  }
+  50% { 
+    transform: translateY(-15px) rotate(0deg); 
+  }
+  75% { 
+    transform: translateY(-8px) rotate(2deg); 
+  }
+}
+
+@keyframes floatIn {
+  0% { 
+    opacity: 0; 
+    transform: translate(-50%, -30%) scale(0.8);
+  }
+  100% { 
+    opacity: 1; 
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+@keyframes underwaterFlow {
+  0%, 100% { transform: translateX(0px) translateY(0px); }
+  25% { transform: translateX(10px) translateY(-5px); }
+  50% { transform: translateX(-5px) translateY(-10px); }
+  75% { transform: translateX(-8px) translateY(-3px); }
+}
+
+@keyframes wave {
+  0%, 100% { 
+    transform: translateY(0px);
+    opacity: 0.4;
+  }
+  50% { 
+    transform: translateY(-5px);
+    opacity: 0.8;
+  }
+}
+
+/* Debug info */
+.debug-info {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  background: rgba(0, 0, 0, 0.7);
+  padding: 10px 15px;
+  border-radius: 8px;
+  font-size: 12px;
+  color: #0ff;
+  font-family: monospace;
+  z-index: 100;
+}
+
+.debug-info p {
+  margin: 5px 0;
 }

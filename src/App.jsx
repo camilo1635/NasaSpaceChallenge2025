@@ -26,6 +26,11 @@ function GameRenderer() {
         console.log('⏭ Saltando museo, pasando a NBL...')
         startTransitionTo('nbl')
       }
+      // Tecla I para ir directamente a ISS (para testing)
+      if (e.key.toLowerCase() === 'i' && import.meta.env.DEV) {
+        console.log('🚀 Saltando a ISS...')
+        startTransitionTo('iss')
+      }
     }
 
     window.addEventListener('keydown', handleKeyDown)
@@ -41,37 +46,70 @@ function GameRenderer() {
     setPendingPhase(targetPhase)
     setTransitionPhase(1)
 
-    // Fase 1: Oscurecimiento gradual (1.5 segundos)
-    setTimeout(() => {
-      console.log('🌊 Fase 2: Texto de transporte')
-      setTransitionPhase(2)
-    }, 1500)
-    
-    // Fase 2: Texto de transporte (2 segundos)
-    setTimeout(() => {
-      console.log('🌊 Fase 3: Efecto burbujas')
-      setTransitionPhase(3)
-    }, 3500)
-    
-    // Fase 3: Efecto burbujas con texto de inmersión (2.5 segundos)
-    setTimeout(() => {
-      console.log('🌊 Fase 4: Finalizando transición')
-      setTransitionPhase(4)
-    }, 6000)
-    
-    // Fase 4: Cambio real de fase (en el punto medio de la transición)
-    setTimeout(() => {
-      console.log(`🌊 Cambiando a fase ${targetPhase}`)
-      dispatch({ type: 'SET_PHASE', payload: targetPhase })
-    }, 7000)
-    
-    // Fase 5: Finalizar transición
-    setTimeout(() => {
-      console.log('🌊 Transición completada')
-      setIsTransitioning(false)
-      setTransitionPhase(0)
-      setPendingPhase(null)
-    }, 9000)
+    // TRANSICIÓN ESPECIAL: NBL -> ISS (Cohete)
+    if (state.currentPhase === 'nbl' && targetPhase === 'iss') {
+      // Transición de cohete (más larga y elaborada)
+      setTimeout(() => {
+        console.log('🚀 Fase 2: Preparando lanzamiento')
+        setTransitionPhase(2)
+      }, 1500)
+      
+      setTimeout(() => {
+        console.log('🚀 Fase 3: Despegue')
+        setTransitionPhase(3)
+      }, 3500)
+      
+      setTimeout(() => {
+        console.log('🚀 Fase 4: Viaje espacial')
+        setTransitionPhase(4)
+      }, 6000)
+      
+      setTimeout(() => {
+        console.log('🚀 Fase 5: Aproximación a ISS')
+        setTransitionPhase(5)
+      }, 9000)
+      
+      setTimeout(() => {
+        console.log(`🚀 Llegando a la ISS`)
+        dispatch({ type: 'SET_PHASE', payload: targetPhase })
+      }, 11000)
+      
+      setTimeout(() => {
+        console.log('🚀 Transición completada')
+        setIsTransitioning(false)
+        setTransitionPhase(0)
+        setPendingPhase(null)
+      }, 13000)
+      
+    } else {
+      // Transición estándar (museo -> NBL)
+      setTimeout(() => {
+        console.log('🌊 Fase 2: Texto de transporte')
+        setTransitionPhase(2)
+      }, 1500)
+      
+      setTimeout(() => {
+        console.log('🌊 Fase 3: Efecto burbujas')
+        setTransitionPhase(3)
+      }, 3500)
+      
+      setTimeout(() => {
+        console.log('🌊 Fase 4: Finalizando transición')
+        setTransitionPhase(4)
+      }, 6000)
+      
+      setTimeout(() => {
+        console.log(`🌊 Cambiando a fase ${targetPhase}`)
+        dispatch({ type: 'SET_PHASE', payload: targetPhase })
+      }, 7000)
+      
+      setTimeout(() => {
+        console.log('🌊 Transición completada')
+        setIsTransitioning(false)
+        setTransitionPhase(0)
+        setPendingPhase(null)
+      }, 9000)
+    }
   }
 
   // Exponer función de transición globalmente para SimpleDoor
@@ -148,11 +186,339 @@ function GameRenderer() {
           <p>Fase: {state.currentPhase}</p>
           <p>Jugador: {state.playerName}</p>
           <p>Presiona 'N' para saltar a NBL</p>
+          <p>Presiona 'I' para saltar a ISS</p>
         </div>
       )}
 
-      {/* 🌊 OVERLAY DE TRANSICIÓN GLOBAL */}
-      {isTransitioning && (
+      {/* 🚀 TRANSICIÓN DE COHETE (NBL -> ISS) */}
+      {isTransitioning && pendingPhase === 'iss' && state.currentPhase === 'nbl' && (
+        <div 
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100vw',
+            height: '100vh',
+            background: transitionPhase === 1 ? 'rgba(0,0,0,0.5)' :
+                       transitionPhase === 2 ? 'linear-gradient(to top, #87CEEB, #4A90E2)' :
+                       transitionPhase === 3 ? 'linear-gradient(to top, #4A90E2, #1e3c72)' :
+                       transitionPhase === 4 ? 'linear-gradient(to top, #000033, #000000)' :
+                       transitionPhase === 5 ? 'radial-gradient(circle, #000033, #000000)' :
+                       '#000000',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 999999,
+            transition: 'all 1.5s ease-in-out',
+            overflow: 'hidden',
+            pointerEvents: 'all'
+          }}>
+          
+          {/* Fase 2: Preparación del lanzamiento */}
+          {transitionPhase === 2 && (
+            <div style={{
+              textAlign: 'center',
+              color: '#fff',
+              animation: 'fadeInUp 1.5s ease-out',
+              zIndex: 1000001
+            }}>
+              <div style={{ 
+                fontSize: '120px',
+                marginBottom: '30px',
+                animation: 'pulse 1s ease-in-out infinite'
+              }}>
+                🚀
+              </div>
+              <h1 style={{ 
+                fontSize: '48px',
+                margin: '0 0 20px',
+                textShadow: '3px 3px 6px rgba(0,0,0,0.5)',
+                letterSpacing: '3px'
+              }}>
+                PREPARANDO LANZAMIENTO
+              </h1>
+              <div style={{
+                fontSize: '72px',
+                fontFamily: 'monospace',
+                color: '#ff3333',
+                animation: 'countdown 1s ease-in-out',
+                textShadow: '0 0 20px rgba(255,51,51,0.8)'
+              }}>
+                3
+              </div>
+            </div>
+          )}
+
+          {/* Fase 3: Despegue */}
+          {transitionPhase === 3 && (
+            <>
+              {/* Tierra en la parte inferior */}
+              <div style={{
+                position: 'absolute',
+                bottom: '-50%',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                width: '200%',
+                height: '100%',
+                background: 'radial-gradient(ellipse at center, #228B22, #006400)',
+                borderRadius: '50%',
+                animation: 'earthShrink 2.5s ease-in forwards'
+              }} />
+              
+              {/* Cohete despegando */}
+              <div style={{
+                position: 'absolute',
+                bottom: '10%',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                textAlign: 'center',
+                animation: 'rocketLaunch 2.5s ease-in forwards',
+                zIndex: 1000002
+              }}>
+                <div style={{
+                  fontSize: '150px',
+                  animation: 'rocketShake 0.1s infinite',
+                  filter: 'drop-shadow(0 50px 50px rgba(255,100,0,0.8))'
+                }}>
+                  🚀
+                </div>
+                
+                {/* Llamas del cohete */}
+                <div style={{
+                  position: 'absolute',
+                  bottom: '-30px',
+                  left: '50%',
+                  transform: 'translateX(-50%)',
+                  fontSize: '80px',
+                  animation: 'flames 0.2s infinite alternate'
+                }}>
+                  🔥
+                </div>
+                
+                {/* Texto de despegue */}
+                <h2 style={{
+                  color: '#fff',
+                  fontSize: '32px',
+                  marginTop: '20px',
+                  textShadow: '2px 2px 4px rgba(0,0,0,0.8)'
+                }}>
+                  ¡DESPEGUE!
+                </h2>
+              </div>
+              
+              {/* Nubes pasando */}
+              {[...Array(5)].map((_, i) => (
+                <div
+                  key={i}
+                  style={{
+                    position: 'absolute',
+                    left: `${Math.random() * 100}%`,
+                    top: `${20 + Math.random() * 60}%`,
+                    fontSize: '60px',
+                    opacity: 0.7,
+                    animation: `cloudPass 1.5s ease-out forwards`,
+                    animationDelay: `${i * 0.2}s`
+                  }}
+                >
+                  ☁️
+                </div>
+              ))}
+            </>
+          )}
+
+          {/* Fase 4: Viaje espacial */}
+          {transitionPhase === 4 && (
+            <>
+              {/* Estrellas de fondo */}
+              <div style={{
+                position: 'absolute',
+                width: '100%',
+                height: '100%',
+                background: 'transparent'
+              }}>
+                {[...Array(100)].map((_, i) => (
+                  <div
+                    key={i}
+                    style={{
+                      position: 'absolute',
+                      left: `${Math.random() * 100}%`,
+                      top: `${Math.random() * 100}%`,
+                      width: '2px',
+                      height: '2px',
+                      background: '#fff',
+                      borderRadius: '50%',
+                      animation: `twinkle ${2 + Math.random() * 3}s infinite`,
+                      animationDelay: `${Math.random() * 2}s`
+                    }}
+                  />
+                ))}
+              </div>
+              
+              {/* Cohete en el espacio */}
+              <div style={{
+                textAlign: 'center',
+                animation: 'floatInSpace 3s ease-in-out infinite',
+                zIndex: 1000001
+              }}>
+                <div style={{ 
+                  fontSize: '100px',
+                  transform: 'rotate(-45deg)',
+                  filter: 'drop-shadow(0 0 30px rgba(255,255,255,0.5))'
+                }}>
+                  🚀
+                </div>
+                <h2 style={{
+                  color: '#fff',
+                  fontSize: '36px',
+                  marginTop: '30px',
+                  textShadow: '2px 2px 4px rgba(0,0,0,0.8)'
+                }}>
+                  VIAJANDO AL ESPACIO
+                </h2>
+                
+                {/* Indicador de velocidad */}
+                <div style={{
+                  marginTop: '20px',
+                  fontSize: '24px',
+                  color: '#00ff00',
+                  fontFamily: 'monospace'
+                }}>
+                  Velocidad: 28,000 km/h
+                </div>
+                
+                {/* Barra de progreso */}
+                <div style={{
+                  width: '300px',
+                  height: '8px',
+                  background: 'rgba(255,255,255,0.2)',
+                  borderRadius: '4px',
+                  margin: '20px auto',
+                  overflow: 'hidden'
+                }}>
+                  <div style={{
+                    width: '100%',
+                    height: '100%',
+                    background: 'linear-gradient(90deg, #00ff00, #00ffff)',
+                    animation: 'progress 3s ease-out'
+                  }} />
+                </div>
+              </div>
+              
+              {/* Tierra alejándose */}
+              <div style={{
+                position: 'absolute',
+                bottom: '-80%',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                width: '600px',
+                height: '600px',
+                background: 'radial-gradient(circle, #4169E1, #000080)',
+                borderRadius: '50%',
+                boxShadow: '0 0 100px rgba(65,105,225,0.5)',
+                animation: 'earthFadeOut 3s ease-out forwards'
+              }} />
+            </>
+          )}
+
+          {/* Fase 5: Aproximación a la ISS */}
+          {transitionPhase === 5 && (
+            <>
+              {/* Estrellas de fondo */}
+              <div style={{
+                position: 'absolute',
+                width: '100%',
+                height: '100%'
+              }}>
+                {[...Array(50)].map((_, i) => (
+                  <div
+                    key={i}
+                    style={{
+                      position: 'absolute',
+                      left: `${Math.random() * 100}%`,
+                      top: `${Math.random() * 100}%`,
+                      width: '1px',
+                      height: '1px',
+                      background: '#fff',
+                      borderRadius: '50%'
+                    }}
+                  />
+                ))}
+              </div>
+              
+              {/* ISS acercándose */}
+              <div style={{
+                textAlign: 'center',
+                animation: 'issApproach 2s ease-out forwards',
+                zIndex: 1000001
+              }}>
+                <div style={{ 
+                  fontSize: '20px',
+                  animation: 'issGrow 2s ease-out forwards',
+                  filter: 'drop-shadow(0 0 20px rgba(255,255,255,0.8))'
+                }}>
+                  🛸
+                </div>
+                
+                <h1 style={{
+                  color: '#fff',
+                  fontSize: '42px',
+                  marginTop: '30px',
+                  textShadow: '3px 3px 6px rgba(0,0,0,0.8)',
+                  animation: 'fadeIn 1.5s ease-out'
+                }}>
+                  LLEGANDO A LA ISS
+                </h1>
+                
+                <p style={{
+                  color: '#00ffff',
+                  fontSize: '24px',
+                  marginTop: '20px',
+                  animation: 'fadeIn 2s ease-out'
+                }}>
+                  Preparando acoplamiento...
+                </p>
+                
+                {/* Indicadores de acoplamiento */}
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  gap: '20px',
+                  marginTop: '30px',
+                  animation: 'fadeIn 2.5s ease-out'
+                }}>
+                  {['Presión', 'Alineación', 'Velocidad'].map((item, i) => (
+                    <div key={i} style={{
+                      padding: '10px 20px',
+                      background: 'rgba(0,255,0,0.2)',
+                      border: '2px solid #00ff00',
+                      borderRadius: '8px',
+                      color: '#00ff00',
+                      fontSize: '14px'
+                    }}>
+                      ✓ {item}
+                    </div>
+                  ))}
+                </div>
+              </div>
+              
+              {/* Cohete pequeño acercándose */}
+              <div style={{
+                position: 'absolute',
+                bottom: '10%',
+                left: '20%',
+                fontSize: '40px',
+                transform: 'rotate(45deg)',
+                animation: 'rocketDock 2s ease-out forwards'
+              }}>
+                🚀
+              </div>
+            </>
+          )}
+        </div>
+      )}
+
+      {/* 🌊 TRANSICIÓN ORIGINAL DE AGUA (para otras transiciones) */}
+      {isTransitioning && pendingPhase === 'nbl' && (
         <div 
           style={{
             position: 'fixed',
@@ -175,7 +541,7 @@ function GameRenderer() {
             pointerEvents: 'all'
           }}>
           
-          {/* Fase 2: Texto de Transporte */}
+          {/* Contenido original de transición a NBL... */}
           {transitionPhase === 2 && (
             <div style={{
               textAlign: 'center',
@@ -207,46 +573,14 @@ function GameRenderer() {
                 opacity: 0.95,
                 textShadow: '2px 2px 4px rgba(0,0,0,0.5)'
               }}>
-                {pendingPhase === 'nbl' ? 'AL LABORATORIO NBL...' : 'A LA SIGUIENTE FASE...'}
+                AL LABORATORIO NBL...
               </p>
-              
-              {/* Barra de progreso */}
-              <div style={{
-                width: '300px',
-                height: '4px',
-                background: 'rgba(255,255,255,0.3)',
-                borderRadius: '2px',
-                margin: '30px auto',
-                overflow: 'hidden'
-              }}>
-                <div style={{
-                  width: '100%',
-                  height: '100%',
-                  background: 'linear-gradient(90deg, #28a745, #20c997)',
-                  animation: 'progressBar 2s ease-out'
-                }} />
-              </div>
             </div>
           )}
 
-          {/* Fase 3: Efecto Burbujas */}
-          {transitionPhase >= 3 && pendingPhase === 'nbl' && (
+          {/* Burbujas y efectos de agua para NBL... */}
+          {transitionPhase >= 3 && (
             <>
-              {/* Fondo acuático animado */}
-              <div style={{
-                position: 'absolute',
-                width: '100%',
-                height: '100%',
-                background: `
-                  radial-gradient(circle at 20% 50%, rgba(0,150,200,0.3) 0%, transparent 50%),
-                  radial-gradient(circle at 80% 20%, rgba(40,167,69,0.2) 0%, transparent 50%),
-                  radial-gradient(circle at 40% 80%, rgba(0,100,150,0.25) 0%, transparent 50%)
-                `,
-                animation: 'underwaterFlow 8s ease-in-out infinite',
-                zIndex: 999999
-              }} />
-              
-              {/* Burbujas mejoradas */}
               <div style={{
                 position: 'absolute',
                 width: '100%',
@@ -275,7 +609,6 @@ function GameRenderer() {
                 ))}
               </div>
               
-              {/* Texto de inmersión */}
               <div style={{
                 position: 'absolute',
                 top: '50%',
@@ -312,40 +645,136 @@ function GameRenderer() {
                 }}>
                   Prepárate para entrenar como un astronauta
                 </p>
-                
-                {/* Ondas de agua */}
-                <div style={{
-                  position: 'absolute',
-                  top: '100%',
-                  left: '50%',
-                  transform: 'translateX(-50%)',
-                  width: '200px',
-                  height: '20px',
-                  marginTop: '20px'
-                }}>
-                  {[0, 1, 2].map(i => (
-                    <div
-                      key={i}
-                      style={{
-                        position: 'absolute',
-                        width: '100%',
-                        height: '2px',
-                        background: 'rgba(255,255,255,0.4)',
-                        borderRadius: '2px',
-                        animation: `wave 2s ease-in-out infinite`,
-                        animationDelay: `${i * 0.3}s`
-                      }}
-                    />
-                  ))}
-                </div>
               </div>
             </>
           )}
         </div>
       )}
 
-      {/* CSS Animations */}
       <style>{`
+        @keyframes fadeInUp {
+          0% { 
+            opacity: 0; 
+            transform: translateY(50px);
+          }
+          100% { 
+            opacity: 1; 
+            transform: translateY(0);
+          }
+        }
+        
+        @keyframes pulse {
+          0%, 100% { transform: scale(1); }
+          50% { transform: scale(1.1); }
+        }
+        
+        @keyframes countdown {
+          0% { transform: scale(0.5); opacity: 0; }
+          50% { transform: scale(1.2); }
+          100% { transform: scale(1); opacity: 1; }
+        }
+        
+        @keyframes earthShrink {
+          0% { 
+            transform: translateX(-50%) scale(1);
+            bottom: -50%;
+          }
+          100% { 
+            transform: translateX(-50%) scale(0.3);
+            bottom: -90%;
+          }
+        }
+        
+        @keyframes rocketLaunch {
+          0% { 
+            transform: translateX(-50%) translateY(0);
+            bottom: 10%;
+          }
+          100% { 
+            transform: translateX(-50%) translateY(-200px);
+            bottom: 50%;
+          }
+        }
+        
+        @keyframes rocketShake {
+          0%, 100% { transform: translateX(-2px); }
+          50% { transform: translateX(2px); }
+        }
+        
+        @keyframes flames {
+          0% { transform: translateX(-50%) scale(1); opacity: 0.8; }
+          100% { transform: translateX(-50%) scale(1.2); opacity: 1; }
+        }
+        
+        @keyframes cloudPass {
+          0% { 
+            transform: translateY(0);
+            opacity: 0.7;
+          }
+          100% { 
+            transform: translateY(200px);
+            opacity: 0;
+          }
+        }
+        
+        @keyframes twinkle {
+          0%, 100% { opacity: 0.3; }
+          50% { opacity: 1; }
+        }
+        
+        @keyframes floatInSpace {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-20px); }
+        }
+        
+        @keyframes progress {
+          0% { transform: translateX(-100%); }
+          100% { transform: translateX(0); }
+        }
+        
+        @keyframes earthFadeOut {
+          0% { 
+            opacity: 1;
+            transform: translateX(-50%) scale(1);
+          }
+          100% { 
+            opacity: 0.3;
+            transform: translateX(-50%) scale(0.5);
+          }
+        }
+        
+        @keyframes issApproach {
+          0% { 
+            transform: scale(0.5);
+            opacity: 0;
+          }
+          100% { 
+            transform: scale(1);
+            opacity: 1;
+          }
+        }
+        
+        @keyframes issGrow {
+          0% { font-size: 20px; }
+          100% { font-size: 150px; }
+        }
+        
+        @keyframes fadeIn {
+          0% { opacity: 0; }
+          100% { opacity: 1; }
+        }
+        
+        @keyframes rocketDock {
+          0% { 
+            bottom: 10%;
+            left: 20%;
+          }
+          100% { 
+            bottom: 45%;
+            left: 45%;
+          }
+        }
+        
         @keyframes smoothFadeIn {
           0% { 
             opacity: 0; 
@@ -364,11 +793,6 @@ function GameRenderer() {
           100% { 
             text-shadow: 0 0 40px rgba(40,167,69,1), 0 0 80px rgba(40,167,69,0.6);
           }
-        }
-        
-        @keyframes progressBar {
-          0% { transform: translateX(-100%); }
-          100% { transform: translateX(0%); }
         }
         
         @keyframes enhancedBubble {
