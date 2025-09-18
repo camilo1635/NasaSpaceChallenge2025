@@ -177,7 +177,7 @@ export function TrainingTasks() {
   const [showCompletion, setShowCompletion] = useState(false)
   const { camera, gl } = useThree()
 
-  // Solo 3 piezas ahora (sin panel solar)
+  // Solo 3 piezas
   const blocks = [
     { id: 1, type: 'base', position: [-6, 1, -2], name: 'Cuerpo Principal del Satélite' },
     { id: 2, type: 'support', position: [6, 1, -2], name: 'Antena de Comunicación' },
@@ -203,11 +203,23 @@ export function TrainingTasks() {
     { 
       id: 'connector-point', 
       position: [0, 1, -1.5], 
-      finalPosition: [0, 1, -2], // Anillo central
+      finalPosition: [0, 1, -2], // Anillo frontal
       expectedType: 'connector', 
       step: 3 
     }
   ]
+
+  // 👇 ACTUALIZAR EL ESTADO GLOBAL CUANDO CAMBIAN LOS VALORES
+  useEffect(() => {
+    dispatch({ 
+      type: 'UPDATE_NBL_TRAINING', 
+      payload: { 
+        currentStep, 
+        connectedBlocks, 
+        showCompletion 
+      } 
+    })
+  }, [currentStep, connectedBlocks, showCompletion, dispatch])
 
   useEffect(() => {
     const onMouseMove = (e) => {
@@ -264,15 +276,6 @@ export function TrainingTasks() {
     setGrabbedPosition(null)
   }
 
-  const getStepInstructions = () => {
-    const instructions = {
-      1: "Coloca el Cuerpo Principal del satélite en la base",
-      2: "Conecta la Antena de Comunicación en la parte superior",
-      3: "Instala el Anillo de Acople en la parte frontal"
-    }
-    return instructions[currentStep] || "¡Entrenamiento completado!"
-  }
-
   // Encontrar la información de conexión para cada bloque
   const getBlockConnectionInfo = (blockId) => {
     return connectedBlocks.find(conn => conn.blockId === blockId)
@@ -316,54 +319,6 @@ export function TrainingTasks() {
           />
         )
       })}
-
-      {/* HUD */}
-      <Html position={[-8, 4, 0]} center>
-        <div style={{
-          background: 'rgba(0,30,60,0.95)',
-          color: '#fff',
-          padding: '15px 20px',
-          borderRadius: '10px',
-          fontSize: '14px',
-          border: '2px solid #00ffff',
-          minWidth: '280px'
-        }}>
-          <h3 style={{ margin: '0 0 10px', color: '#00ffff' }}>🛰️ ENSAMBLA EL SATÉLITE</h3>
-          <div><strong>Paso {currentStep}/3:</strong></div>
-          <div style={{ fontSize: '13px', marginTop: '5px', color: '#ffff00' }}>
-            {getStepInstructions()}
-          </div>
-          <div style={{ fontSize: '12px', opacity: 0.8, marginTop: '10px' }}>
-            Progreso: {connectedBlocks.length}/3 módulos conectados
-          </div>
-          <div style={{ fontSize: '11px', opacity: 0.6, marginTop: '5px' }}>
-            Controles: [E] Agarrar | [Q] Soltar
-          </div>
-        </div>
-      </Html>
-
-      {showCompletion && (
-        <Html position={[0, 8, -3]} center>
-          <div style={{
-            background: 'linear-gradient(135deg, rgba(40,167,69,0.95), rgba(0,100,0,0.95))',
-            color: '#fff',
-            padding: '25px 35px',
-            borderRadius: '20px',
-            textAlign: 'center',
-            border: '3px solid #28a745',
-            boxShadow: '0 10px 30px rgba(0,0,0,0.5)',
-            transform: 'translateZ(100px)'
-          }}>
-            <h2 style={{ margin: '0 0 15px', fontSize: '24px' }}>🎉 ¡SATÉLITE ENSAMBLADO!</h2>
-            <p style={{ margin: '10px 0', fontSize: '16px' }}>
-              Estructura completa: ✅ Cuerpo + Antena + Anillo de Acople
-            </p>
-            <p style={{ margin: '10px 0', fontSize: '14px', opacity: 0.9 }}>
-              Iniciando transferencia a la ISS...
-            </p>
-          </div>
-        </Html>
-      )}
     </group>
   )
 }
