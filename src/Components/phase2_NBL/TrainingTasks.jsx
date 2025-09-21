@@ -265,7 +265,11 @@ export function TrainingTasks() {
       if (currentStep >= 3) {
         setShowCompletion(true)
         setTimeout(() => {
-          dispatch({ type: 'SET_PHASE', payload: 'iss' })
+          if(window.startGlobalTransition){
+            window.startGlobalTransition('iss')
+          }else {
+            dispatch({ type: 'SET_PHASE', payload: 'iss'})
+          }
         }, 4000)
       }
     } else {
