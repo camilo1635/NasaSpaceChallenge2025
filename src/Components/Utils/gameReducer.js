@@ -5,7 +5,13 @@ export const initialState = {
   currentPhase: 'menu', // 'menu', 'museum', 'nbl', 'iss'
   playerPosition: [0, 0, 0],
   playerName: '',
-  gameStarted: false
+  gameStarted: false,
+  // 👇 AGREGAR ESTADO NBL TRAINING
+  nblTraining: {
+    currentStep: 1,
+    connectedBlocks: [],
+    showCompletion: false
+  }
 }
 
 // Reducer ultra simplificado
@@ -26,6 +32,16 @@ export function gameReducer(state, action) {
         ...state, 
         gameStarted: true, 
         currentPhase: 'museum'
+      }
+    
+    // 👇 AGREGAR ESTE CASO PARA NBL TRAINING
+    case 'UPDATE_NBL_TRAINING':
+      return {
+        ...state,
+        nblTraining: {
+          ...state.nblTraining,
+          ...action.payload
+        }
       }
 
     default:

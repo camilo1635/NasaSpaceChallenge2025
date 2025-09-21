@@ -1,27 +1,14 @@
 // src/Components/phase2_NBL/UI/TrainingHUD.jsx
-import React, { useEffect } from 'react'
+import React from 'react'
 import { useGameState } from '../../Utils/useGameState'
 
-export function TrainingHUD({ 
-  currentStep = 1, 
-  connectedBlocks = [], 
-  showCompletion = false,
-  getStepInstructions 
-}) {
-  const { dispatch } = useGameState()
+export function TrainingHUD({ getStepInstructions }) {
+  const { state, dispatch } = useGameState() // 👈 Obtener el estado global
   
-  // Detectar tecla M para saltar fase
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (e.key.toLowerCase() === 'm') {
-        console.log('⏭ Saltando NBL, pasando a ISS...')
-        dispatch({ type: 'SET_PHASE', payload: 'iss' })
-      }
-    }
-
-    window.addEventListener('keydown', handleKeyDown)
-    return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [dispatch])
+  // 👇 Leer los valores del estado global
+  const currentStep = state.nblTraining?.currentStep || 1
+  const connectedBlocks = state.nblTraining?.connectedBlocks || []
+  const showCompletion = state.nblTraining?.showCompletion || false
 
   // Función por defecto para las instrucciones
   const defaultGetStepInstructions = () => {
@@ -145,17 +132,6 @@ export function TrainingHUD({
               transition: 'width 0.5s ease'
             }} />
           </div>
-        </div>
-
-        {/* Shortcut para desarrollo */}
-        <div style={{
-          fontSize: '11px',
-          opacity: 0.7,
-          textAlign: 'center',
-          borderTop: '1px solid rgba(255,255,255,0.2)',
-          paddingTop: '8px'
-        }}>
-          Presiona <strong>M</strong> para saltar a la ISS
         </div>
       </div>
 
