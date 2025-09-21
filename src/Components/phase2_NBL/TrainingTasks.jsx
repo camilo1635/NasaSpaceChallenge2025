@@ -144,7 +144,7 @@ function NBLBlock({ blockData, onGrab, onRelease, isGrabbed, grabPosition, isCon
 }
 
 /* 🔹 PUNTO DE CONEXIÓN */
-function ConnectionPoint({ position, isActive, expectedType, onConnect }) {
+function ConnectionPoint({ position, isActive, onConnect }) {
   const pointRef = useRef()
   useFrame(() => {
     if (!pointRef.current || !isActive) return

@@ -14,7 +14,7 @@ function MainMenu() {
       dispatch({ type: 'ADD_ACHIEVEMENT', payload: 'first_visit' })
     }
   }
-  
+   
   const handleShowWelcome = () => {
     setShowWelcome(!showWelcome)
   }
