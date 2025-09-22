@@ -17,26 +17,37 @@ function GameRenderer() {
   const { state, dispatch } = useGameState()
   
   // Estado para el video de introducción global
-  const [showGlobalIntro, setShowGlobalIntro] = useState(true)
+  const [showGlobalIntro, setShowGlobalIntro] = useState(false) // Cambiado a false
   const [globalIntroEnded, setGlobalIntroEnded] = useState(false)
+  const [gameStarted, setGameStarted] = useState(false) // Nuevo estado
   
   // Estado para manejar transición global
   const [isTransitioning, setIsTransitioning] = useState(false)
   const [transitionPhase, setTransitionPhase] = useState(0)
   const [pendingPhase, setPendingPhase] = useState(null)
 
+  // Detectar cuando el juego inicia desde el menú
+  useEffect(() => {
+    if (state.gameStarted && !gameStarted) {
+      setGameStarted(true)
+      setShowGlobalIntro(true) // Mostrar video intro cuando se inicia el juego
+    }
+  }, [state.gameStarted, gameStarted])
+
   // Función para manejar el final del video global
   const handleGlobalIntroEnd = () => {
     setGlobalIntroEnded(true)
     setTimeout(() => {
       setShowGlobalIntro(false)
+      // Ir directamente al museo después del video
+      dispatch({ type: 'SET_PHASE', payload: 'museum' })
     }, 1000)
   }
 
   // Listener para saltar con tecla (ejemplo: "N")
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if (e.key.toLowerCase() === 'n') {
+      if (e.key.toLowerCase() === 'n' && state.currentPhase === 'museum') {
         console.log('Saltando museo, pasando a NBL...')
         startTransitionTo('nbl')
       }
@@ -49,7 +60,7 @@ function GameRenderer() {
 
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [])
+  }, [state.currentPhase])
 
   // Función para iniciar transición global
   const startTransitionTo = (targetPhase) => {
@@ -85,11 +96,13 @@ function GameRenderer() {
       
       setTimeout(() => {
         console.log(`Llegando a la ISS`)
+        window.isTransitioningToISS = true // Flag para no mostrar intro de ISS
         dispatch({ type: 'SET_PHASE', payload: targetPhase })
       }, 11000)
       
       setTimeout(() => {
         console.log('Transición completada')
+        window.isTransitioningToISS = false
         setIsTransitioning(false)
         setTransitionPhase(0)
         setPendingPhase(null)
@@ -138,7 +151,7 @@ function GameRenderer() {
   // Render según la fase
   // ==========================
   const renderCurrentPhase = () => {
-    // PRIMERO: Mostrar video de introducción global si no se ha visto
+    // Si se está mostrando el video intro después del menú
     if (showGlobalIntro) {
       return (
         <GlobalIntroVideo 
@@ -148,7 +161,7 @@ function GameRenderer() {
       )
     }
 
-    // DESPUÉS: Flujo normal del juego
+    // Flujo normal del juego
     switch (state.currentPhase) {
       case 'menu':
         return <MainMenu />
@@ -169,12 +182,15 @@ function GameRenderer() {
       
       case 'iss':
         return <ISSScene /> 
+        
+      default:
+        return <LoadingScreen />
     }
   }
 
   return (
     <div className="game-container">
-      {/* Título del juego - No mostrar durante el video inicial */}
+      {/* Título del juego - No mostrar durante el menú o video inicial */}
       {!showGlobalIntro && state.currentPhase !== 'menu' && !isTransitioning && (
         <div className="game-title">
           <h1>ISS 25° Aniversario - Aventura Espacial</h1>
@@ -189,8 +205,8 @@ function GameRenderer() {
       {/* Render de la fase actual */}
       {renderCurrentPhase()}
 
-      {/* Debug info simplificado - No mostrar durante el video inicial */}
-      {import.meta.env.DEV && !isTransitioning && !showGlobalIntro && (
+      {/* Debug info simplificado - No mostrar durante el menú o video inicial */}
+      {import.meta.env.DEV && !isTransitioning && !showGlobalIntro && state.currentPhase !== 'menu' && (
         <div className="debug-info">
           <p>Fase: {state.currentPhase}</p>
           <p>Jugador: {state.playerName}</p>
@@ -246,6 +262,21 @@ function GameRenderer() {
               }}>
                 PREPARANDO LANZAMIENTO
               </h1>
+              <div 
+                key={countdownNumber}
+                style={{
+                  fontSize: '72px',
+                  fontFamily: 'monospace',
+                  color: countdownNumber === 3 ? '#ff3333' : 
+                         countdownNumber === 2 ? '#ff8800' : 
+                         '#ffff00',
+                  animation: 'countdown 0.8s ease-in-out',
+                  textShadow: countdownNumber === 3 ? '0 0 20px rgba(255,51,51,0.8)' :
+                              countdownNumber === 2 ? '0 0 20px rgba(255,136,0,0.8)' :
+                              '0 0 20px rgba(255,255,0,0.8)'
+                }}>
+                {countdownNumber}
+              </div>
             </div>
           )}
 
