@@ -7,20 +7,20 @@ function MainMenu() {
   const [fadeIn, setFadeIn] = useState(false)
   
   useEffect(() => {
-    // Animación de entrada suave
+    // Smooth fade-in animation
     setTimeout(() => setFadeIn(true), 500)
   }, [])
   
   const handleStartGame = () => {
-    // Iniciar directamente sin pedir nombre
-    dispatch({ type: 'SET_PLAYER_NAME', payload: 'Astronauta' })
+    // Start directly without asking for name
+    dispatch({ type: 'SET_PLAYER_NAME', payload: 'Astronaut' })
     dispatch({ type: 'START_GAME' })
     dispatch({ type: 'ADD_ACHIEVEMENT', payload: 'first_visit' })
   }
   
   return (
     <div className="main-menu">
-      {/* Background con estrellas animadas */}
+      {/* Animated stars background */}
       <div className="stars-background">
         {Array.from({ length: 100 }, (_, i) => (
           <div 
@@ -38,7 +38,7 @@ function MainMenu() {
         ))}
       </div>
       
-      {/* Contenido principal centrado */}
+      {/* Centered main content */}
       <div style={{
         position: 'absolute',
         top: '50%',
@@ -49,7 +49,7 @@ function MainMenu() {
         opacity: fadeIn ? 1 : 0,
         transition: 'opacity 2s ease-in-out'
       }}>
-        {/* Panel de información del juego */}
+        {/* Game information panel */}
         <div style={{
           background: 'rgba(0, 0, 0, 0.85)',
           borderRadius: '20px',
@@ -58,7 +58,7 @@ function MainMenu() {
           border: '2px solid rgba(77, 166, 255, 0.3)',
           boxShadow: '0 8px 32px rgba(0, 0, 0, 0.5)'
         }}>
-          {/* Título del juego */}
+          {/* Game title */}
           <div style={{ textAlign: 'center', marginBottom: '30px' }}>
             <div style={{ fontSize: '60px', marginBottom: '15px' }}>🛰️</div>
             <h1 style={{
@@ -67,18 +67,18 @@ function MainMenu() {
               textShadow: '0 0 20px rgba(77, 166, 255, 0.5)',
               marginBottom: '10px'
             }}>
-              ISS 25° ANIVERSARIO
+              ISS 25TH ANNIVERSARY
             </h1>
             <p style={{
               fontSize: '18px',
               color: '#ffcc00',
               fontStyle: 'italic'
             }}>
-              Una Aventura Educativa Interactiva
+              An Interactive Educational Adventure
             </p>
           </div>
 
-          {/* Información del juego */}
+          {/* Game information */}
           <div style={{
             color: '#ffffff',
             fontSize: '16px',
@@ -88,12 +88,12 @@ function MainMenu() {
             opacity: 0.9
           }}>
             <p style={{ marginBottom: '20px' }}>
-              Celebra 25 años de cooperación internacional en el espacio explorando la historia,
-              el entrenamiento y la vida a bordo de la Estación Espacial Internacional.
+              Celebrate 25 years of international cooperation in space by exploring the history,
+              training, and life aboard the International Space Station.
             </p>
           </div>
 
-          {/* Fases del juego */}
+          {/* Game phases */}
           <div style={{ marginBottom: '30px' }}>
             <h3 style={{
               textAlign: 'center',
@@ -101,7 +101,7 @@ function MainMenu() {
               marginBottom: '20px',
               fontSize: '20px'
             }}>
-              Tu Viaje Espacial
+              Your Space Journey
             </h3>
             
             <div style={{
@@ -120,9 +120,9 @@ function MainMenu() {
                 border: '1px solid rgba(77, 166, 255, 0.3)'
               }}>
                 <div style={{ fontSize: '40px', marginBottom: '10px' }}>🏛️</div>
-                <h4 style={{ color: '#4da6ff', marginBottom: '5px' }}>MUSEO ISS</h4>
+                <h4 style={{ color: '#4da6ff', marginBottom: '5px' }}>ISS MUSEUM</h4>
                 <p style={{ fontSize: '14px', color: '#ccc' }}>
-                  Explora 25 años de historia espacial
+                  Explore 25 years of space history
                 </p>
               </div>
 
@@ -136,9 +136,9 @@ function MainMenu() {
                 border: '1px solid rgba(77, 166, 255, 0.3)'
               }}>
                 <div style={{ fontSize: '40px', marginBottom: '10px' }}>🏊‍♂️</div>
-                <h4 style={{ color: '#4da6ff', marginBottom: '5px' }}>ENTRENAMIENTO NBL</h4>
+                <h4 style={{ color: '#4da6ff', marginBottom: '5px' }}>NBL TRAINING</h4>
                 <p style={{ fontSize: '14px', color: '#ccc' }}>
-                  Entrena bajo el agua como un astronauta real
+                  Train underwater like a real astronaut
                 </p>
               </div>
 
@@ -152,15 +152,15 @@ function MainMenu() {
                 border: '1px solid rgba(77, 166, 255, 0.3)'
               }}>
                 <div style={{ fontSize: '40px', marginBottom: '10px' }}>🚀</div>
-                <h4 style={{ color: '#4da6ff', marginBottom: '5px' }}>VIDA EN LA ISS</h4>
+                <h4 style={{ color: '#4da6ff', marginBottom: '5px' }}>LIFE ON ISS</h4>
                 <p style={{ fontSize: '14px', color: '#ccc' }}>
-                  Experimenta la vida en microgravedad
+                  Experience life in microgravity
                 </p>
               </div>
             </div>
           </div>
 
-          {/* Botón de inicio */}
+          {/* Start button */}
           <div style={{ textAlign: 'center' }}>
             <button 
               onClick={handleStartGame}
@@ -186,22 +186,22 @@ function MainMenu() {
                 e.target.style.boxShadow = '0 4px 15px rgba(77, 166, 255, 0.4)'
               }}
             >
-              🚀 COMENZAR AVENTURA
+              🚀 START ADVENTURE
             </button>
 
-            {/* Instrucciones */}
+            {/* Instructions */}
             <p style={{
               marginTop: '20px',
               fontSize: '12px',
               color: '#888',
               fontStyle: 'italic'
             }}>
-              Presiona el botón para iniciar tu viaje espacial
+              Press the button to begin your space journey
             </p>
           </div>
         </div>
 
-        {/* Créditos o información adicional */}
+        {/* Credits or additional info */}
         <div style={{
           textAlign: 'center',
           marginTop: '20px',

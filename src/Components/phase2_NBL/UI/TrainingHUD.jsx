@@ -3,28 +3,28 @@ import React from 'react'
 import { useGameState } from '../../Utils/useGameState'
 
 export function TrainingHUD({ getStepInstructions }) {
-  const { state, dispatch } = useGameState() // 👈 Obtener el estado global
+  const { state, dispatch } = useGameState() // Get global state
   
-  // 👇 Leer los valores del estado global
+  // Read values from global state
   const currentStep = state.nblTraining?.currentStep || 1
   const connectedBlocks = state.nblTraining?.connectedBlocks || []
   const showCompletion = state.nblTraining?.showCompletion || false
 
-  // Función por defecto para las instrucciones
+  // Default function for instructions
   const defaultGetStepInstructions = () => {
     const instructions = {
-      1: "Coloca el Cuerpo Principal del satélite en la base",
-      2: "Conecta la Antena de Comunicación en la parte superior", 
-      3: "Instala el Anillo de Acople en la parte frontal"
+      1: "Place the Satellite Main Body on the base",
+      2: "Connect the Communication Antenna on top", 
+      3: "Install the Docking Ring on the front"
     }
-    return instructions[currentStep] || "¡Entrenamiento completado!"
+    return instructions[currentStep] || "Training completed!"
   }
 
   const stepInstructions = getStepInstructions || defaultGetStepInstructions
 
   return (
     <>
-      {/* HUD de Controles (Fixed) - Solo DOM */}
+      {/* Controls HUD (Fixed) - DOM only */}
       <div style={{
         position: 'fixed',
         top: '20px',
@@ -40,7 +40,7 @@ export function TrainingHUD({ getStepInstructions }) {
         zIndex: 1000,
         minWidth: '280px'
       }}>
-        {/* Título */}
+        {/* Title */}
         <div style={{
           display: 'flex',
           alignItems: 'center',
@@ -50,30 +50,30 @@ export function TrainingHUD({ getStepInstructions }) {
         }}>
           <span style={{ fontSize: '20px', marginRight: '8px' }}>🏊‍♂️</span>
           <h3 style={{ margin: 0, fontSize: '16px', color: '#87ceeb' }}>
-            ENTRENAMIENTO NBL
+            NBL TRAINING
           </h3>
         </div>
 
-        {/* Controles */}
+        {/* Controls */}
         <div style={{ marginBottom: '15px' }}>
           <div style={{ fontSize: '13px', marginBottom: '6px' }}>
-            <span style={{ color: '#ffeb3b' }}>🎮</span> <strong>WASD</strong> - Movimiento horizontal
+            <span style={{ color: '#ffeb3b' }}>🎮</span> <strong>WASD</strong> - Horizontal movement
           </div>
           <div style={{ fontSize: '13px', marginBottom: '6px' }}>
-            <span style={{ color: '#ffeb3b' }}>⌨️</span> <strong>ESPACIO</strong> - Subir
+            <span style={{ color: '#ffeb3b' }}>⌨️</span> <strong>SPACE</strong> - Go up
           </div>
           <div style={{ fontSize: '13px', marginBottom: '6px' }}>
-            <span style={{ color: '#ffeb3b' }}>⬇️</span> <strong>SHIFT</strong> - Bajar
+            <span style={{ color: '#ffeb3b' }}>⬇️</span> <strong>SHIFT</strong> - Go down
           </div>
           <div style={{ fontSize: '13px', marginBottom: '6px' }}>
-            <span style={{ color: '#ffeb3b' }}>🖱️</span> <strong>Ratón</strong> - Mirar alrededor
+            <span style={{ color: '#ffeb3b' }}>🖱️</span> <strong>Mouse</strong> - Look around
           </div>
           <div style={{ fontSize: '13px' }}>
-            <span style={{ color: '#00ff88' }}>🔧</span> <strong>E</strong> - Agarrar | <strong>Q</strong> - Soltar
+            <span style={{ color: '#00ff88' }}>🔧</span> <strong>E</strong> - Grab | <strong>Q</strong> - Release
           </div>
         </div>
 
-        {/* Misión actual */}
+        {/* Current mission */}
         <div style={{
           background: 'rgba(0,0,0,0.4)',
           padding: '12px',
@@ -86,22 +86,22 @@ export function TrainingHUD({ getStepInstructions }) {
             fontSize: '14px', 
             color: '#00ff88'
           }}>
-            🎯 MISIÓN: ENSAMBLAJE DE SATÉLITE
+            🎯 MISSION: SATELLITE ASSEMBLY
           </h4>
           
           <p style={{ fontSize: '12px', margin: '4px 0', lineHeight: '1.4' }}>
-            <strong>Paso {currentStep}/3:</strong> {stepInstructions()}
+            <strong>Step {currentStep}/3:</strong> {stepInstructions()}
           </p>
           
           <div style={{ fontSize: '11px', marginTop: '8px', opacity: 0.8 }}>
-            1. Acércate a los componentes flotando<br/>
-            2. Presiona E cerca para agarrarlos<br/>
-            3. Lleva cada pieza al punto verde correcto<br/>
-            4. Presiona Q cerca del punto para conectar
+            1. Approach the floating components<br/>
+            2. Press E nearby to grab them<br/>
+            3. Take each piece to the correct green point<br/>
+            4. Press Q near the point to connect
           </div>
         </div>
 
-        {/* Progreso */}
+        {/* Progress */}
         <div style={{
           background: 'rgba(40,167,69,0.3)',
           padding: '10px',
@@ -114,10 +114,10 @@ export function TrainingHUD({ getStepInstructions }) {
             fontWeight: 'bold',
             marginBottom: '4px'
           }}>
-            📊 PROGRESO: {connectedBlocks.length}/3 módulos
+            📊 PROGRESS: {connectedBlocks.length}/3 modules
           </div>
           
-          {/* Barra de progreso */}
+          {/* Progress bar */}
           <div style={{
             background: 'rgba(255,255,255,0.2)',
             height: '6px',
@@ -135,7 +135,7 @@ export function TrainingHUD({ getStepInstructions }) {
         </div>
       </div>
 
-      {/* Mensaje de completación */}
+      {/* Completion message */}
       {showCompletion && (
         <div style={{
           position: 'fixed',
@@ -151,12 +151,12 @@ export function TrainingHUD({ getStepInstructions }) {
           boxShadow: '0 10px 30px rgba(0,0,0,0.5)',
           zIndex: 1001
         }}>
-          <h2 style={{ margin: '0 0 15px', fontSize: '24px' }}>🎉 ¡SATÉLITE ENSAMBLADO!</h2>
+          <h2 style={{ margin: '0 0 15px', fontSize: '24px' }}>🎉 SATELLITE ASSEMBLED!</h2>
           <p style={{ margin: '10px 0', fontSize: '16px' }}>
-            Estructura completa: ✅ Cuerpo + Antena + Anillo de Acople
+            Complete structure: ✅ Body + Antenna + Docking Ring
           </p>
           <p style={{ margin: '10px 0', fontSize: '14px', opacity: 0.9 }}>
-            Iniciando transferencia a la ISS...
+            Starting transfer to ISS...
           </p>
         </div>
       )}

@@ -5,7 +5,7 @@ import { useGameState } from '../Utils/useGameState'
 import * as THREE from 'three'
 import { Html, useGLTF } from '@react-three/drei'
 
-/* 🔹 COMPONENTES PARA PARTES DEL SATÉLITE */
+/* 🔹 SATELLITE PART COMPONENTS */
 function SatelliteBody(props) {
   const { scene } = useGLTF('/models/sat01_body_satellite.glb')
   return <primitive object={scene.clone()} {...props} />
@@ -21,7 +21,7 @@ function DockingRing(props) {
   return <primitive object={scene.clone()} {...props} />
 }
 
-/* 🔹 BLOQUE NBL (pieza del satélite) */
+/* 🔹 NBL BLOCK (satellite piece) */
 function NBLBlock({ blockData, onGrab, onRelease, isGrabbed, grabPosition, isConnected, finalPosition }) {
   const blockRef = useRef()
   const { camera } = useThree()
@@ -30,18 +30,18 @@ function NBLBlock({ blockData, onGrab, onRelease, isGrabbed, grabPosition, isCon
   useFrame(() => {
     if (!blockRef.current) return
 
-    // Si está conectado, mantenerlo en su posición final
+    // If connected, keep it in its final position
     if (isConnected && finalPosition) {
       blockRef.current.position.copy(finalPosition)
-      blockRef.current.rotation.set(0, Math.PI / 2, 0) // Orientación consistente
+      blockRef.current.rotation.set(0, Math.PI / 2, 0) // Consistent orientation
       return
     }
 
-    // Si está siendo agarrado
+    // If being grabbed
     if (isGrabbed && grabPosition) {
       blockRef.current.position.copy(grabPosition)
     } else if (!isConnected) {
-      // Animación flotante solo si no está conectado
+      // Floating animation only if not connected
       blockRef.current.position.y = blockData.position[1] + Math.sin(Date.now() * 0.003 + blockData.id) * 0.1
       blockRef.current.rotation.y += 0.005
     }
@@ -76,9 +76,9 @@ function NBLBlock({ blockData, onGrab, onRelease, isGrabbed, grabPosition, isCon
     }
   }, [isNearby, isGrabbed, isConnected, blockData.id, onGrab, onRelease])
 
-  /* 🔹 RENDERIZADO DEL MODELO SEGÚN EL TIPO */
+  /* 🔹 RENDER MODEL BASED ON TYPE */
   const renderBlockGeometry = () => {
-    const baseScale = 0.15 // Escala base consistente
+    const baseScale = 0.15 // Consistent base scale
     
     switch (blockData.type) {
       case 'base':
@@ -113,7 +113,7 @@ function NBLBlock({ blockData, onGrab, onRelease, isGrabbed, grabPosition, isCon
           }}>
             <div style={{ fontWeight: 'bold', marginBottom: '5px' }}>{blockData.name}</div>
             <div style={{ fontSize: '11px', opacity: 0.9 }}>
-              Presiona <span style={{color: '#00ffff'}}>E</span> para agarrar
+              Press <span style={{color: '#00ffff'}}>E</span> to grab
             </div>
           </div>
           <style>{`
@@ -135,7 +135,7 @@ function NBLBlock({ blockData, onGrab, onRelease, isGrabbed, grabPosition, isCon
             fontSize: '12px',
             border: '2px solid #00ff00'
           }}>
-            Presiona <span style={{color: '#00ff00'}}>Q</span> para soltar
+            Press <span style={{color: '#00ff00'}}>Q</span> to release
           </div>
         </Html>
       )}
@@ -143,7 +143,7 @@ function NBLBlock({ blockData, onGrab, onRelease, isGrabbed, grabPosition, isCon
   )
 }
 
-/* 🔹 PUNTO DE CONEXIÓN */
+/* 🔹 CONNECTION POINT */
 function ConnectionPoint({ position, isActive, onConnect }) {
   const pointRef = useRef()
   useFrame(() => {
@@ -167,7 +167,7 @@ function ConnectionPoint({ position, isActive, onConnect }) {
   )
 }
 
-/* 🔹 COMPONENTE PRINCIPAL */
+/* 🔹 MAIN COMPONENT */
 export function TrainingTasks() {
   const { dispatch } = useGameState()
   const [grabbedBlock, setGrabbedBlock] = useState(null)
@@ -177,39 +177,39 @@ export function TrainingTasks() {
   const [showCompletion, setShowCompletion] = useState(false)
   const { camera, gl } = useThree()
 
-  // Solo 3 piezas
+  // Only 3 pieces
   const blocks = [
-    { id: 1, type: 'base', position: [-6, 1, -2], name: 'Cuerpo Principal del Satélite' },
-    { id: 2, type: 'support', position: [6, 1, -2], name: 'Antena de Comunicación' },
-    { id: 3, type: 'connector', position: [-6, 1, 4], name: 'Anillo de Acople' }
+    { id: 1, type: 'base', position: [-6, 1, -2], name: 'Satellite Main Body' },
+    { id: 2, type: 'support', position: [6, 1, -2], name: 'Communication Antenna' },
+    { id: 3, type: 'connector', position: [-6, 1, 4], name: 'Docking Ring' }
   ]
 
-  // Posiciones finales ajustadas según la imagen
+  // Final positions adjusted according to the image
   const connectionPoints = [
     { 
       id: 'base-point', 
       position: [0, 1, -3], 
-      finalPosition: [0, 1, -3], // Centro base
+      finalPosition: [0, 1, -3], // Base center
       expectedType: 'base', 
       step: 1 
     },
     { 
       id: 'support-point', 
       position: [0, 2.5, -3], 
-      finalPosition: [0, 3.2, -3], // Antena arriba del cuerpo
+      finalPosition: [0, 3.2, -3], // Antenna above the body
       expectedType: 'support', 
       step: 2 
     },
     { 
       id: 'connector-point', 
       position: [0, 1, -1.5], 
-      finalPosition: [0, 1, -2], // Anillo frontal
+      finalPosition: [0, 1, -2], // Front ring
       expectedType: 'connector', 
       step: 3 
     }
   ]
 
-  // 👇 ACTUALIZAR EL ESTADO GLOBAL CUANDO CAMBIAN LOS VALORES
+  // UPDATE GLOBAL STATE WHEN VALUES CHANGE
   useEffect(() => {
     dispatch({ 
       type: 'UPDATE_NBL_TRAINING', 
@@ -250,7 +250,7 @@ export function TrainingTasks() {
     const validPoint = connectionPoints.find(point => 
       point.expectedType === block.type && 
       point.step === currentStep &&
-      position.distanceTo(new THREE.Vector3(...point.position)) < 3.5 // Aumentado el rango de detección
+      position.distanceTo(new THREE.Vector3(...point.position)) < 3.5 // Increased detection range
     )
 
     if (validPoint) {
@@ -261,7 +261,7 @@ export function TrainingTasks() {
       }])
       setCurrentStep(prev => prev + 1)
 
-      // Ahora son solo 3 pasos
+      // Now only 3 steps
       if (currentStep >= 3) {
         setShowCompletion(true)
         setTimeout(() => {
@@ -273,27 +273,27 @@ export function TrainingTasks() {
         }, 4000)
       }
     } else {
-      console.log('❌ Conexión inválida, intenta de nuevo')
+      console.log('❌ Invalid connection, try again')
     }
 
     setGrabbedBlock(null)
     setGrabbedPosition(null)
   }
 
-  // Encontrar la información de conexión para cada bloque
+  // Find connection information for each block
   const getBlockConnectionInfo = (blockId) => {
     return connectedBlocks.find(conn => conn.blockId === blockId)
   }
 
   return (
     <group>
-      {/* Base de construcción - plataforma más visible */}
+      {/* Construction base - more visible platform */}
       <mesh position={[0, 0.5, -3]} castShadow receiveShadow>
         <boxGeometry args={[5, 0.2, 3]} />
         <meshStandardMaterial color="#404040" metalness={0.7} roughness={0.3} />
       </mesh>
 
-      {/* Zona de ensamblaje visual */}
+      {/* Visual assembly zone */}
       <mesh position={[0, 0.6, -3]}>
         <ringGeometry args={[2.5, 3, 32]} />
         <meshBasicMaterial color="#00ffff" transparent opacity={0.2} />

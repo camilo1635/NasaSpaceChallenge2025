@@ -48,12 +48,12 @@ function GameRenderer() {
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key.toLowerCase() === 'n' && state.currentPhase === 'museum') {
-        console.log('Saltando museo, pasando a NBL...')
+        console.log('Skipping museum, going to NBL...')
         startTransitionTo('nbl')
       }
       // Tecla I para ir directamente a ISS (para testing)
       if (e.key.toLowerCase() === 'i' && import.meta.env.DEV) {
-        console.log('Saltando a ISS...')
+        console.log('Skipping to ISS...')
         startTransitionTo('iss')
       }
     }
@@ -66,7 +66,7 @@ function GameRenderer() {
   const startTransitionTo = (targetPhase) => {
     if (isTransitioning) return // Evitar múltiples transiciones
     
-    console.log(`Iniciando transición global hacia: ${targetPhase}`)
+    console.log(`Starting global transition to: ${targetPhase}`)
     setIsTransitioning(true)
     setPendingPhase(targetPhase)
     setTransitionPhase(1)
@@ -75,63 +75,64 @@ function GameRenderer() {
     if (state.currentPhase === 'nbl' && targetPhase === 'iss') {
       // Transición de cohete (más larga y elaborada)
       setTimeout(() => {
-        console.log('Fase 2: Preparando lanzamiento')
+        console.log('Phase 2: Preparing launch')
         setTransitionPhase(2)
       }, 1500)
       
       setTimeout(() => {
-        console.log('Fase 3: Despegue')
+        console.log('Phase 3: Liftoff')
         setTransitionPhase(3)
       }, 3500)
       
       setTimeout(() => {
-        console.log('Fase 4: Viaje espacial')
+        console.log('Phase 4: Space travel')
         setTransitionPhase(4)
       }, 6000)
       
       setTimeout(() => {
-        console.log('Fase 5: Aproximación a ISS')
+        console.log('Phase 5: Approaching ISS')
         setTransitionPhase(5)
       }, 9000)
       
       setTimeout(() => {
-        console.log(`Llegando a la ISS`)
+        console.log(`Arriving at ISS`)
         window.isTransitioningToISS = true // Flag para no mostrar intro de ISS
         dispatch({ type: 'SET_PHASE', payload: targetPhase })
-      }, 11000)
+      }, 13500) // Tiempo extendido para completar animación
       
       setTimeout(() => {
-        console.log('Transición completada')
+        console.log('Transition completed')
         window.isTransitioningToISS = false
         setIsTransitioning(false)
         setTransitionPhase(0)
         setPendingPhase(null)
-      }, 13000)
+        setCountdownNumber(3) // Reset para próxima vez
+      }, 15000)
       
     } else {
       // Transición estándar (museo -> NBL)
       setTimeout(() => {
-        console.log('Fase 2: Texto de transporte')
+        console.log('Phase 2: Transport text')
         setTransitionPhase(2)
       }, 1500)
       
       setTimeout(() => {
-        console.log('Fase 3: Efecto burbujas')
+        console.log('Phase 3: Bubble effect')
         setTransitionPhase(3)
       }, 3500)
       
       setTimeout(() => {
-        console.log('Fase 4: Finalizando transición')
+        console.log('Phase 4: Finalizing transition')
         setTransitionPhase(4)
       }, 6000)
       
       setTimeout(() => {
-        console.log(`Cambiando a fase ${targetPhase}`)
+        console.log(`Changing to phase ${targetPhase}`)
         dispatch({ type: 'SET_PHASE', payload: targetPhase })
       }, 7000)
       
       setTimeout(() => {
-        console.log('Transición completada')
+        console.log('Transition completed')
         setIsTransitioning(false)
         setTransitionPhase(0)
         setPendingPhase(null)
@@ -193,11 +194,11 @@ function GameRenderer() {
       {/* Título del juego - No mostrar durante el menú o video inicial */}
       {!showGlobalIntro && state.currentPhase !== 'menu' && !isTransitioning && (
         <div className="game-title">
-          <h1>ISS 25° Aniversario - Aventura Espacial</h1>
+          <h1>ISS 25th Anniversary - Space Adventure</h1>
           <div className="phase-indicator">
-            {state.currentPhase === 'museum' && 'Fase 1: Museo ISS'}
-            {state.currentPhase === 'nbl' && 'Fase 2: Entrenamiento NBL'}
-            {state.currentPhase === 'iss' && 'Fase 3: En la ISS'}
+            {state.currentPhase === 'museum' && 'Phase 1: ISS Museum'}
+            {state.currentPhase === 'nbl' && 'Phase 2: NBL Training'}
+            {state.currentPhase === 'iss' && 'Phase 3: On the ISS'}
           </div>
         </div>
       )}
@@ -208,10 +209,10 @@ function GameRenderer() {
       {/* Debug info simplificado - No mostrar durante el menú o video inicial */}
       {import.meta.env.DEV && !isTransitioning && !showGlobalIntro && state.currentPhase !== 'menu' && (
         <div className="debug-info">
-          <p>Fase: {state.currentPhase}</p>
-          <p>Jugador: {state.playerName}</p>
-          <p>Presiona 'N' para saltar a NBL</p>
-          <p>Presiona 'I' para saltar a ISS</p>
+          <p>Phase: {state.currentPhase}</p>
+          <p>Player: {state.playerName}</p>
+          <p>Press 'N' to skip to NBL</p>
+          <p>Press 'I' to skip to ISS</p>
         </div>
       )}
 
@@ -239,7 +240,7 @@ function GameRenderer() {
             pointerEvents: 'all'
           }}>
           
-          {/* Fase 2: Preparación del lanzamiento */}
+          {/* Phase 2: Launch preparation WITH COUNTDOWN */}
           {transitionPhase === 2 && (
             <div style={{
               textAlign: 'center',
@@ -260,30 +261,15 @@ function GameRenderer() {
                 textShadow: '3px 3px 6px rgba(0,0,0,0.5)',
                 letterSpacing: '3px'
               }}>
-                PREPARANDO LANZAMIENTO
+                PREPARING LAUNCH
               </h1>
-              <div 
-                key={countdownNumber}
-                style={{
-                  fontSize: '72px',
-                  fontFamily: 'monospace',
-                  color: countdownNumber === 3 ? '#ff3333' : 
-                         countdownNumber === 2 ? '#ff8800' : 
-                         '#ffff00',
-                  animation: 'countdown 0.8s ease-in-out',
-                  textShadow: countdownNumber === 3 ? '0 0 20px rgba(255,51,51,0.8)' :
-                              countdownNumber === 2 ? '0 0 20px rgba(255,136,0,0.8)' :
-                              '0 0 20px rgba(255,255,0,0.8)'
-                }}>
-                {countdownNumber}
-              </div>
             </div>
           )}
 
-          {/* Fase 3: Despegue */}
+          {/* Phase 3: Liftoff */}
           {transitionPhase === 3 && (
             <>
-              {/* Tierra en la parte inferior */}
+              {/* Earth at the bottom */}
               <div style={{
                 position: 'absolute',
                 bottom: '-50%',
@@ -296,7 +282,7 @@ function GameRenderer() {
                 animation: 'earthShrink 2.5s ease-in forwards'
               }} />
               
-              {/* Cohete despegando */}
+              {/* Rocket lifting off */}
               <div style={{
                 position: 'absolute',
                 bottom: '10%',
@@ -314,7 +300,7 @@ function GameRenderer() {
                   🚀
                 </div>
                 
-                {/* Llamas del cohete */}
+                {/* Rocket flames */}
                 <div style={{
                   position: 'absolute',
                   bottom: '-30px',
@@ -326,18 +312,18 @@ function GameRenderer() {
                   🔥
                 </div>
                 
-                {/* Texto de despegue */}
+                {/* Liftoff text */}
                 <h2 style={{
                   color: '#fff',
                   fontSize: '32px',
                   marginTop: '20px',
                   textShadow: '2px 2px 4px rgba(0,0,0,0.8)'
                 }}>
-                  ¡DESPEGUE!
+                  LIFTOFF!
                 </h2>
               </div>
               
-              {/* Nubes pasando */}
+              {/* Passing clouds */}
               {[...Array(5)].map((_, i) => (
                 <div
                   key={i}
@@ -357,10 +343,10 @@ function GameRenderer() {
             </>
           )}
 
-          {/* Fase 4: Viaje espacial */}
+          {/* Phase 4: Space travel */}
           {transitionPhase === 4 && (
             <>
-              {/* Estrellas de fondo */}
+              {/* Background stars */}
               <div style={{
                 position: 'absolute',
                 width: '100%',
@@ -385,7 +371,7 @@ function GameRenderer() {
                 ))}
               </div>
               
-              {/* Cohete en el espacio */}
+              {/* Rocket in space */}
               <div style={{
                 textAlign: 'center',
                 animation: 'floatInSpace 3s ease-in-out infinite',
@@ -404,20 +390,20 @@ function GameRenderer() {
                   marginTop: '30px',
                   textShadow: '2px 2px 4px rgba(0,0,0,0.8)'
                 }}>
-                  VIAJANDO AL ESPACIO
+                  TRAVELING TO SPACE
                 </h2>
                 
-                {/* Indicador de velocidad */}
+                {/* Speed indicator */}
                 <div style={{
                   marginTop: '20px',
                   fontSize: '24px',
                   color: '#00ff00',
                   fontFamily: 'monospace'
                 }}>
-                  Velocidad: 28,000 km/h
+                  Speed: 28,000 km/h
                 </div>
                 
-                {/* Barra de progreso */}
+                {/* Progress bar */}
                 <div style={{
                   width: '300px',
                   height: '8px',
@@ -435,7 +421,7 @@ function GameRenderer() {
                 </div>
               </div>
               
-              {/* Tierra alejándose */}
+              {/* Earth moving away */}
               <div style={{
                 position: 'absolute',
                 bottom: '-80%',
@@ -451,10 +437,10 @@ function GameRenderer() {
             </>
           )}
 
-          {/* Fase 5: Aproximación a la ISS */}
+          {/* Phase 5: Approaching ISS */}
           {transitionPhase === 5 && (
             <>
-              {/* Estrellas de fondo */}
+              {/* Background stars */}
               <div style={{
                 position: 'absolute',
                 width: '100%',
@@ -476,7 +462,7 @@ function GameRenderer() {
                 ))}
               </div>
               
-              {/* ISS acercándose */}
+              {/* ISS approaching */}
               <div style={{
                 textAlign: 'center',
                 animation: 'issApproach 2s ease-out forwards',
@@ -497,7 +483,7 @@ function GameRenderer() {
                   textShadow: '3px 3px 6px rgba(0,0,0,0.8)',
                   animation: 'fadeIn 1.5s ease-out'
                 }}>
-                  LLEGANDO A LA ISS
+                  ARRIVING AT ISS
                 </h1>
                 
                 <p style={{
@@ -506,10 +492,10 @@ function GameRenderer() {
                   marginTop: '20px',
                   animation: 'fadeIn 2s ease-out'
                 }}>
-                  Preparando acoplamiento...
+                  Preparing docking...
                 </p>
                 
-                {/* Indicadores de acoplamiento */}
+                {/* Docking indicators */}
                 <div style={{
                   display: 'flex',
                   justifyContent: 'center',
@@ -517,7 +503,7 @@ function GameRenderer() {
                   marginTop: '30px',
                   animation: 'fadeIn 2.5s ease-out'
                 }}>
-                  {['Presión', 'Alineación', 'Velocidad'].map((item, i) => (
+                  {['Pressure', 'Alignment', 'Speed'].map((item, i) => (
                     <div key={i} style={{
                       padding: '10px 20px',
                       background: 'rgba(0,255,0,0.2)',
@@ -532,7 +518,7 @@ function GameRenderer() {
                 </div>
               </div>
               
-              {/* Cohete pequeño acercándose */}
+              {/* Small rocket approaching */}
               <div style={{
                 position: 'absolute',
                 bottom: '10%',
@@ -548,7 +534,7 @@ function GameRenderer() {
         </div>
       )}
 
-      {/* TRANSICIÓN ORIGINAL DE AGUA (para otras transiciones) */}
+      {/* ORIGINAL WATER TRANSITION (for other transitions) */}
       {isTransitioning && pendingPhase === 'nbl' && (
         <div 
           style={{
@@ -572,7 +558,7 @@ function GameRenderer() {
             pointerEvents: 'all'
           }}>
           
-          {/* Contenido original de transición a NBL... */}
+          {/* Original NBL transition content... */}
           {transitionPhase === 2 && (
             <div style={{
               textAlign: 'center',
@@ -596,7 +582,7 @@ function GameRenderer() {
                 letterSpacing: '2px',
                 fontWeight: 'bold'
               }}>
-                TRANSPORTÁNDOTE
+                TRANSPORTING YOU
               </h1>
               <p style={{ 
                 fontSize: '28px', 
@@ -604,12 +590,12 @@ function GameRenderer() {
                 opacity: 0.95,
                 textShadow: '2px 2px 4px rgba(0,0,0,0.5)'
               }}>
-                AL LABORATORIO NBL...
+                TO THE NBL LABORATORY...
               </p>
             </div>
           )}
 
-          {/* Burbujas y efectos de agua para NBL... */}
+          {/* Bubbles and water effects for NBL... */}
           {transitionPhase >= 3 && (
             <>
               <div style={{
@@ -666,7 +652,7 @@ function GameRenderer() {
                   letterSpacing: '1.5px',
                   fontWeight: 'bold'
                 }}>
-                  SUMERGIÉNDOTE EN EL NBL
+                  DIVING INTO THE NBL
                 </h1>
                 <p style={{ 
                   fontSize: '22px', 
@@ -674,7 +660,7 @@ function GameRenderer() {
                   opacity: 0.95,
                   textShadow: '2px 2px 4px rgba(0,0,0,0.6)'
                 }}>
-                  Prepárate para entrenar como un astronauta
+                  Get ready to train like an astronaut
                 </p>
               </div>
             </>
