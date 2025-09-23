@@ -10,7 +10,7 @@ export function ISSHUD() {
   useEffect(() => {
     const timer = setTimeout(() => {
       setShowControls(false)
-    }, 10000) // Más tiempo para leer las nuevas instrucciones
+    }, 12000) // Más tiempo para leer las nuevas instrucciones
 
     return () => clearTimeout(timer)
   }, [])
@@ -62,7 +62,7 @@ export function ISSHUD() {
           borderRadius: '15px',
           fontSize: '14px',
           border: '2px solid #00ffff',
-          maxWidth: '350px',
+          maxWidth: '380px',
           boxShadow: '0 10px 25px rgba(0,0,0,0.5)',
           zIndex: 999,
           animation: 'slideIn 0.5s ease'
@@ -85,6 +85,28 @@ export function ISSHUD() {
               <div><strong>ESPACIO</strong> - Propulsor hacia arriba</div>
               <div><strong>SHIFT</strong> - Propulsor hacia abajo</div>
               <div><strong>Mouse</strong> - Orientación (clic para capturar)</div>
+            </div>
+          </div>
+
+          <div style={{ 
+            marginBottom: '15px',
+            padding: '8px',
+            background: 'rgba(0,255,255,0.1)',
+            borderRadius: '6px',
+            border: '1px solid rgba(0,255,255,0.3)'
+          }}>
+            <h4 style={{ margin: '0 0 8px', color: '#00ffff', fontSize: '14px' }}>
+              Vista Rápida a Cúpula:
+            </h4>
+            <div style={{ fontSize: '12px', lineHeight: '1.4' }}>
+              <div><strong>S</strong> - Centrar y mirar hacia la cúpula</div>
+              <div style={{ marginTop: '4px', opacity: 0.8, fontSize: '11px' }}>
+                Posiciona automáticamente al jugador en el centro<br/>
+                y orienta la vista hacia arriba para ver la cúpula
+              </div>
+              <div style={{ marginTop: '4px', opacity: 0.9, fontSize: '11px', color: '#ffff99' }}>
+                Presiona S nuevamente para volver al control normal
+              </div>
             </div>
           </div>
 
@@ -111,6 +133,9 @@ export function ISSHUD() {
               <div><strong>ESC</strong> - Cerrar galería</div>
               <div style={{ marginTop: '5px', opacity: 0.8 }}>
                 Ve a la cúpula superior para acceder a las imágenes
+              </div>
+              <div style={{ marginTop: '3px', opacity: 0.9, fontSize: '11px', color: '#87ceeb' }}>
+                Tip: Usa la vista rápida (S) para llegar más fácil
               </div>
             </div>
           </div>
@@ -155,6 +180,9 @@ export function ISSHUD() {
         </div>
         <div style={{ fontSize: '12px', marginTop: '8px', opacity: 0.7 }}>
           Explora las estaciones de video y la galería de la cúpula
+        </div>
+        <div style={{ fontSize: '11px', marginTop: '5px', opacity: 0.8, color: '#87ceeb' }}>
+          Consejo: Usa "S" para acceder rápidamente a la vista de la cúpula
         </div>
       </div>
 

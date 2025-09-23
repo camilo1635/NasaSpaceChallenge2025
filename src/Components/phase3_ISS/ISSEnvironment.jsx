@@ -36,7 +36,6 @@ export function ISSEnvironment() {
     <group>
       {/* Módulo principal - Cilindro principal de la ISS */}
       <mesh position={[0, 0, 0]} receiveShadow castShadow>
-        <cylinderGeometry args={[4, 4, 15]} />
         <meshStandardMaterial 
           color="#f0f0f0" 
           roughness={0.3}
@@ -66,9 +65,8 @@ export function ISSEnvironment() {
         )
       })}
 
-      {/* SUELO CORREGIDO - Sin disco extraño */}
+      {/* SUELO CORREGIDO */}
       <group position={[0, -7.2, 0]}>
-        {/* Base estructural del suelo */}
         <mesh>
           <cylinderGeometry args={[3.9, 3.9, 0.3]} />
           <meshStandardMaterial 
@@ -78,7 +76,6 @@ export function ISSEnvironment() {
           />
         </mesh>
         
-        {/* Paneles del suelo en grid hexagonal */}
         {Array.from({length: 6}, (_, i) => {
           const angle = (i / 6) * Math.PI * 2
           const x = Math.cos(angle) * 1.5
@@ -95,7 +92,6 @@ export function ISSEnvironment() {
           )
         })}
         
-        {/* Panel central del suelo */}
         <mesh position={[0, 0.16, 0]} rotation={[-Math.PI/2, 0, 0]}>
           <cylinderGeometry args={[0.8, 0.8, 0.02, 8]} />
           <meshStandardMaterial 
@@ -105,7 +101,6 @@ export function ISSEnvironment() {
           />
         </mesh>
         
-        {/* Detalles estructurales del suelo */}
         {Array.from({length: 4}, (_, i) => {
           const angle = (i / 4) * Math.PI * 2
           const x = Math.cos(angle) * 2.5
@@ -123,112 +118,54 @@ export function ISSEnvironment() {
         })}
       </group>
 
-      {/* TECHO - Simplificado porque tenemos la cúpula */}
-      <mesh position={[0, 7, 0]} rotation={[Math.PI/2, 0, 0]} receiveShadow>
-        <cylinderGeometry args={[3.9, 3.9, 0.15]} />
-        <meshStandardMaterial 
-          color="#c0c0c0" 
-          roughness={0.5}
-          metalness={0.5}
-        />
-      </mesh>
-
-      {/* CÚPULA MEJORADA - MÁS PEQUEÑA Y PROPORCIONADA */}
-      <group position={[0, 7.8, 0]}>
-        {/* Base metálica de la cúpula */}
-        <mesh position={[0, -0.2, 0]}>
-          <cylinderGeometry args={[2.2, 2.4, 0.3]} />
+      {/* TECHO CON APERTURA PARA LA CÚPULA - SIN SUPERPOSICIÓN */}
+      <group position={[0, 7, 0]}>
+        {/* Anillo del techo con apertura central */}
+        <mesh rotation={[Math.PI/2, 0, 0]}>
+          <ringGeometry args={[2.5, 3.9]} />
           <meshStandardMaterial 
-            color="#e8e8e8"
-            metalness={0.8}
-            roughness={0.2}
-          />
-        </mesh>
-
-        {/* Domo principal más pequeño */}
-        <mesh>
-          <sphereGeometry args={[2.2, 32, 16, 0, Math.PI * 2, 0, Math.PI/2]} />
-          <meshStandardMaterial 
-            color="#ffffff" 
-            transparent 
-            opacity={0.12}
-            roughness={0.05}
-            metalness={0.95}
-            envMapIntensity={1.0}
+            color="#c0c0c0" 
+            roughness={0.5}
+            metalness={0.5}
           />
         </mesh>
         
-        {/* Marco estructural ajustado */}
+        {/* Vigas estructurales del techo */}
         {Array.from({length: 8}, (_, i) => {
           const angle = (i / 8) * Math.PI * 2
+          const innerX = Math.cos(angle) * 2.5
+          const innerZ = Math.sin(angle) * 2.5
+          const outerX = Math.cos(angle) * 3.9
+          const outerZ = Math.sin(angle) * 3.9
+          
           return (
-            <mesh key={i} position={[0, 0.9, 0]} rotation={[0, angle, 0]}>
-              <boxGeometry args={[0.06, 1.8, 0.08]} />
+            <mesh 
+              key={i} 
+              position={[(innerX + outerX) / 2, 0.05, (innerZ + outerZ) / 2]} 
+              rotation={[0, angle, 0]}
+            >
+              <boxGeometry args={[1.4, 0.1, 0.15]} />
               <meshStandardMaterial 
-                color="#d0d0d0" 
-                metalness={0.9} 
-                roughness={0.1}
+                color="#a8a8a8" 
+                roughness={0.4}
+                metalness={0.7}
               />
             </mesh>
           )
         })}
-
-        {/* Ventanas hexagonales más pequeñas */}
-        {Array.from({length: 6}, (_, i) => {
-          const angle = (i / 6) * Math.PI * 2
-          const x = Math.cos(angle) * 1.6
-          const z = Math.sin(angle) * 1.6
-          return (
-            <group key={i} position={[x, 0.7, z]} rotation={[0, -angle, 0]}>
-              <mesh>
-                <cylinderGeometry args={[0.55, 0.55, 0.08, 6]} />
-                <meshStandardMaterial 
-                  color="#ffffff" 
-                  metalness={0.9} 
-                  roughness={0.1}
-                />
-              </mesh>
-              
-              <mesh position={[0, 0, 0.05]}>
-                <cylinderGeometry args={[0.5, 0.5, 0.015, 6]} />
-                <meshStandardMaterial 
-                  color="#87ceeb"
-                  transparent
-                  opacity={0.3}
-                  metalness={0.1}
-                  roughness={0.0}
-                  envMapIntensity={2.0}
-                />
-              </mesh>
-            </group>
-          )
-        })}
-
-        {/* Ventana central superior ajustada */}
-        <group position={[0, 1.6, 0]}>
-          <mesh rotation={[-Math.PI/2, 0, 0]}>
-            <cylinderGeometry args={[0.9, 0.9, 0.12, 8]} />
-            <meshStandardMaterial 
-              color="#ffffff" 
-              metalness={0.95} 
-              roughness={0.05}
-            />
-          </mesh>
-          
-          <mesh position={[0, -0.03, 0]} rotation={[-Math.PI/2, 0, 0]}>
-            <cylinderGeometry args={[0.8, 0.8, 0.02, 8]} />
-            <meshStandardMaterial 
-              color="#e6f3ff"
-              transparent
-              opacity={0.2}
-              metalness={0.05}
-              roughness={0.0}
-              envMapIntensity={3.0}
-            />
-          </mesh>
-        </group>
+        
+        {/* Marco circular interno para la apertura */}
+        <mesh position={[0, 0.08, 0]} rotation={[Math.PI/2, 0, 0]}>
+          <torusGeometry args={[2.5, 0.1]} />
+          <meshStandardMaterial 
+            color="#ffffff" 
+            roughness={0.2}
+            metalness={0.8}
+          />
+        </mesh>
       </group>
 
+    
       {/* Paneles de control */}
       {[
         { pos: [-2.7, 0, 0], rot: [0, Math.PI/2, 0] },
@@ -256,7 +193,7 @@ export function ISSEnvironment() {
         </group>
       ))}
 
-      {/* Ventana de observación principal */}
+      {/* Ventana de observación principal lateral */}
       <mesh position={[0, 1, -7.2]} rotation={[0, 0, 0]}>
         <ringGeometry args={[1.2, 2.0]} />
         <meshStandardMaterial 
@@ -266,14 +203,14 @@ export function ISSEnvironment() {
         />
       </mesh>
 
-      {/* Vista al espacio */}
+      {/* Vista al espacio lateral */}
       <mesh position={[0, 1, -7.5]}>
         <circleGeometry args={[1.8]} />
         <meshBasicMaterial color="#000011" />
       </mesh>
 
-      {/* Estrellas */}
-      {Array.from({length: 50}, (_, i) => (
+      {/* Estrellas en ventana lateral */}
+      {Array.from({length: 30}, (_, i) => (
         <mesh 
           key={i}
           position={[
@@ -291,10 +228,10 @@ export function ISSEnvironment() {
         </mesh>
       ))}
 
-      {/* TIERRA CORREGIDA - Dimensiones ajustadas */}
-      <group position={[-3, 25, 2]} rotation={[0.2, 0, 0.1]}>
+      {/* TIERRA PERFECTAMENTE VISIBLE - Posicionada para verse desde la cúpula */}
+      <group position={[0, 22, -5]} rotation={[0.3, 0, 0.1]}>
         <mesh ref={earthRef}>
-          <sphereGeometry args={[8, 64, 32]} />
+          <sphereGeometry args={[6, 64, 32]} />
           <meshStandardMaterial 
             map={earthTexture}
             normalMap={normalTexture}
@@ -305,65 +242,73 @@ export function ISSEnvironment() {
         </mesh>
 
         <mesh ref={cloudsRef}>
-          <sphereGeometry args={[8.1, 64, 32]} />
+          <sphereGeometry args={[6.05, 64, 32]} />
           <meshStandardMaterial 
             map={cloudsTexture}
             transparent
-            opacity={cloudsTexture ? 0.4 : 0.2}
+            opacity={cloudsTexture ? 0.2 : 0.6}
             color={cloudsTexture ? "#ffffff" : "#ffffff"}
             alphaTest={0.1}
           />
         </mesh>
 
         <mesh>
-          <sphereGeometry args={[8.3, 32, 16]} />
+          <sphereGeometry args={[6.15, 32, 16]} />
           <meshStandardMaterial 
             color="#87ceeb"
             transparent
-            opacity={0.15}
+            opacity={0.1}
             side={THREE.BackSide}
           />
         </mesh>
 
         {!earthTexture && (
           <>
-            <mesh position={[-2, 1.5, 7]}>
-              <sphereGeometry args={[1.8]} />
-              <meshStandardMaterial color="#228b22" />
+            <mesh position={[-1.5, 1, 5.2]}>
+              <sphereGeometry args={[1.2]} />
+              <meshStandardMaterial color="#156515ff" />
             </mesh>
             
-            <mesh position={[0.8, 3, 7.5]}>
-              <sphereGeometry args={[1.5]} />
+            <mesh position={[0.6, 2, 5.5]}>
+              <sphereGeometry args={[1]} />
               <meshStandardMaterial color="#8fbc8f" />
             </mesh>
             
-            <mesh position={[2.5, 0.5, 7.2]}>
-              <sphereGeometry args={[2]} />
-              <meshStandardMaterial color="#32cd32" />
+            <mesh position={[1.8, 0.3, 5.3]}>
+              <sphereGeometry args={[1.4]} />
+              <meshStandardMaterial color="#1e921eff" />
             </mesh>
           </>
         )}
       </group>
 
-      {/* Iluminación */}
-      <ambientLight intensity={0.2} color="#4a90e2" />
+      {/* Iluminación optimizada */}
+      <ambientLight intensity={0.3} color="#4a90e2" />
       
       <directionalLight
-        position={[20, 10, 15]}
-        intensity={2.0}
+        position={[15, 20, 8]}
+        intensity={1.8}
         color="#fff8dc"
         castShadow
       />
 
-      {Array.from({length: 4}, (_, i) => (
+      {/* Luz adicional para iluminar la Tierra */}
+      <pointLight 
+        position={[0, 18, 0]} 
+        intensity={0.8} 
+        color="#ffffff" 
+        distance={25}
+      />
+
+      {Array.from({length: 3}, (_, i) => (
         <pointLight
           key={i}
           position={[
-            (Math.random() - 0.5) * 4,
-            (Math.random() - 0.5) * 8,
-            (Math.random() - 0.5) * 4
+            (Math.random() - 0.5) * 6,
+            (Math.random() - 0.5) * 10,
+            (Math.random() - 0.5) * 6
           ]}
-          intensity={0.3}
+          intensity={0.2}
           color="#ffffff"
         />
       ))}
