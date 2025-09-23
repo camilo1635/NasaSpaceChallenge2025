@@ -22,14 +22,14 @@ export function ISSPlayerControls({ children }) {
     }
   }, [])
 
-  // Manejo de ratón para rotación libre
+  // Manejo de ratón para rotación libre COMPLETA
   useEffect(() => {
     const onMouseMove = (e) => {
       if (document.pointerLockElement === gl.domElement) {
         rotation.current.x -= e.movementX * 0.002
         rotation.current.y -= e.movementY * 0.002
-        // En microgravedad, permitimos rotación completa
-        rotation.current.y = Math.max(-Math.PI/2, Math.min(Math.PI/2, rotation.current.y))
+        // ROTACIÓN VERTICAL COMPLETA - Casi 180 grados
+        rotation.current.y = Math.max(-Math.PI * 0.95, Math.min(Math.PI * 0.95, rotation.current.y))
       }
     }
     document.addEventListener('mousemove', onMouseMove)
@@ -47,11 +47,11 @@ export function ISSPlayerControls({ children }) {
     if (!playerRef.current) return
 
     // Física de microgravedad
-    const thrust = 0.02 // Menor impulso, más realista
-    const damping = 0.98 // Menos resistencia que en la Tierra
+    const thrust = 0.02
+    const damping = 0.98
     const maxSpeed = 0.15
 
-    // Direcciones basadas en la rotación del jugador (como en NBL)
+    // Direcciones basadas en la rotación del jugador (manteniendo sistema original)
     const forward = new THREE.Vector3(
       Math.sin(rotation.current.x),
       0,
@@ -64,7 +64,7 @@ export function ISSPlayerControls({ children }) {
     )
     const up = new THREE.Vector3(0, 1, 0)
 
-    // Aplicar fuerzas de propulsión (como en NBL pero con física espacial)
+    // Aplicar fuerzas de propulsión
     const dir = new THREE.Vector3()
     
     if (keys.current['w']) dir.sub(forward) // Adelante
@@ -85,44 +85,49 @@ export function ISSPlayerControls({ children }) {
       velocity.current.normalize().multiplyScalar(maxSpeed)
     }
 
-    // Aplicar amortiguación (muy ligera en microgravedad)
+    // Aplicar amortiguación
     velocity.current.multiplyScalar(damping)
 
     // Actualizar posición
     playerRef.current.position.add(velocity.current)
 
-    // Límites cilíndricos de la ISS (ampliados para el cilindro más grande)
+    // Límites cilíndricos de la ISS
     const pos = playerRef.current.position
-    const maxRadius = 3.5 // Radio más generoso para el jugador
+    const maxRadius = 3.5
     const distanceFromCenter = Math.sqrt(pos.x * pos.x + pos.z * pos.z)
     
-    // Mantener dentro del cilindro principal
     if (distanceFromCenter > maxRadius) {
       const angle = Math.atan2(pos.z, pos.x)
       pos.x = Math.cos(angle) * maxRadius
       pos.z = Math.sin(angle) * maxRadius
-      // Rebote suave
       velocity.current.multiplyScalar(0.3)
     }
     
-    // Límites verticales
-    pos.y = Math.max(-6, Math.min(6, pos.y))
+    // LÍMITES VERTICALES AMPLIADOS
+    pos.y = Math.max(-6, Math.min(9, pos.y))
     
-    if (pos.y <= -6 || pos.y >= 6) {
-      velocity.current.y *= -0.3 // Rebote vertical
+    if (pos.y <= -6 || pos.y >= 9) {
+      velocity.current.y *= -0.3
     }
 
-    // Cámara detrás del jugador con límites propios
+    // CÁMARA HÍBRIDA: Tercera persona que puede mirar arriba/abajo
     const cameraOffset = new THREE.Vector3(0, 1.5, 3.5)
+    
+    // Aplicar rotación horizontal al offset
     const offsetRotated = cameraOffset
       .clone()
       .applyAxisAngle(new THREE.Vector3(0, 1, 0), rotation.current.x)
-
-    const targetCameraPos = playerRef.current.position.clone().add(offsetRotated)
     
-    // Aplicar límites a la cámara también (más generosos)
+    // NUEVO: Aplicar también rotación vertical al offset
+    const finalOffset = offsetRotated
+      .clone()
+      .applyAxisAngle(new THREE.Vector3(1, 0, 0), rotation.current.y * 0.3) // Factor 0.3 para suavizar
+
+    const targetCameraPos = playerRef.current.position.clone().add(finalOffset)
+    
+    // Aplicar límites a la cámara
     const cameraDistanceFromCenter = Math.sqrt(targetCameraPos.x * targetCameraPos.x + targetCameraPos.z * targetCameraPos.z)
-    const maxCameraRadius = 3.8 // Radio máximo para la cámara (cerca del borde)
+    const maxCameraRadius = 3.8
     
     if (cameraDistanceFromCenter > maxCameraRadius) {
       const cameraAngle = Math.atan2(targetCameraPos.z, targetCameraPos.x)
@@ -130,17 +135,27 @@ export function ISSPlayerControls({ children }) {
       targetCameraPos.z = Math.sin(cameraAngle) * maxCameraRadius
     }
     
-    // Límites verticales para la cámara
-    targetCameraPos.y = Math.max(-6.8, Math.min(6.8, targetCameraPos.y))
+    // Límites verticales para la cámara (más generosos)
+    targetCameraPos.y = Math.max(-6.8, Math.min(10.5, targetCameraPos.y))
     
-    // Interpolación suave para simular flotación
+    // Interpolación suave
     camera.position.lerp(targetCameraPos, 0.12)
     
-    // Dirección de la cámara hacia el jugador
-    const lookAtTarget = playerRef.current.position.clone().add(new THREE.Vector3(0, 0.5, 0))
+    // DIRECCIÓN DE VISTA MEJORADA: Combina seguimiento del jugador + rotación vertical
+    const lookAtTarget = playerRef.current.position.clone()
+    lookAtTarget.y += 0.5 // Altura base
+    
+    // Aplicar rotación vertical a la dirección de vista
+    const verticalLookOffset = new THREE.Vector3(
+      Math.sin(rotation.current.x) * Math.sin(rotation.current.y) * 2,
+      -Math.cos(rotation.current.y) * 2 + 0.5,
+      Math.cos(rotation.current.x) * Math.sin(rotation.current.y) * 2
+    )
+    
+    lookAtTarget.add(verticalLookOffset)
     camera.lookAt(lookAtTarget)
 
-    // Rotación del jugador basada en el movimiento (como en NBL)
+    // Rotación del jugador basada en el movimiento
     if (dir.lengthSq() > 0) {
       const angle = Math.atan2(dir.x, dir.z)
       playerRef.current.rotation.y = THREE.MathUtils.lerp(
@@ -156,7 +171,6 @@ export function ISSPlayerControls({ children }) {
       playerRef.current.rotation.x = Math.sin(time * 0.7) * 0.03
       playerRef.current.rotation.z = Math.cos(time * 0.5) * 0.02
     } else {
-      // Flotación idle más sutil
       const time = Date.now() * 0.001
       playerRef.current.rotation.x = Math.sin(time * 0.3) * 0.015
       playerRef.current.rotation.z = Math.cos(time * 0.2) * 0.01

@@ -37,16 +37,17 @@ export function SimpleHUD() {
 
         {/* Instrucciones */}
         <div style={{ marginBottom: '15px' }}>
-          <div style={{ fontSize: '20px', marginBottom: '6px' }}>
-            <span style={{ color: '#ffeb3b' }}>🎮</span> <strong>WASD</strong> - Movimiento
-          </div>
-          <div style={{ fontSize: '20px', marginBottom: '6px' }}>
-            <span style={{ color: '#ffeb3b' }}>🖱️</span> <strong>Ratón</strong> - Mirar alrededor
-          </div>
-          <div style={{ fontSize: '20px' }}>
-            <span style={{ color: '#ffeb3b' }}>👀</span> <strong>Observa</strong> - Los carteles informativos
-          </div>
+        <div style={{ fontSize: '20px', marginBottom: '6px' }}>
+          <span style={{ color: '#ffeb3b' }}>🎮</span> <strong>WASD</strong> - Move
         </div>
+        <div style={{ fontSize: '20px', marginBottom: '6px' }}>
+          <span style={{ color: '#ffeb3b' }}>🖱️</span> <strong>Mouse</strong> - Look around
+        </div>
+        <div style={{ fontSize: '20px' }}>
+          <span style={{ color: '#ffeb3b' }}>👀</span> <strong>Observe</strong> - The information signs
+        </div>
+      </div>
+
 
         
 

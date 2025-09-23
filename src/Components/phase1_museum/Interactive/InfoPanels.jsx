@@ -58,7 +58,7 @@ export function InfoPanels() {
         }}>
           {/* Título */}
           <h2 style={{margin: '0 0 10px', color: '#00ffff', fontSize: '22px'}}>
-            🛰️ MISIÓN ACTUAL
+            🛰️ CURRENT MISSION
           </h2>
           
           {/* Descripción apilada debajo */}
