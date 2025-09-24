@@ -12,9 +12,9 @@ export function CupolaImages() {
       id: 'earth_view',
       position: [0, 9, 1.4],
       rotation: [0, 0, 0],
-      src: '/images/earth_from_iss.jpg',
-      title: 'Vista de la Tierra desde la ISS',
-      description: 'Imagen capturada desde la Estación Espacial Internacional mostrando nuestro planeta azul.'
+      src: '/images/Hurricane_Franklin.jpg',
+      title: 'Hurricane Franklin in the Atlantic Ocean',
+      description: 'Imagenn capturada desde la Estación Espacial Internacional mostrando nuestro planeta azul.'
     },
     {
       id: 'aurora',

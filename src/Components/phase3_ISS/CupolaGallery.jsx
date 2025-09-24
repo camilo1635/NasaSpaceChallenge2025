@@ -4,7 +4,7 @@ import { useFrame, useThree } from '@react-three/fiber'
 import { Html } from '@react-three/drei'
 import * as THREE from 'three'
 
-export function CupolaGallery({ onImageGalleryRequest }) {
+export function CupolaGallery({ onImageGalleryRequest, isGalleryOpen = false }) {
   const galleryRef = useRef()
   const { camera } = useThree()
   const [isNearCupola, setIsNearCupola] = useState(false)
@@ -25,10 +25,10 @@ export function CupolaGallery({ onImageGalleryRequest }) {
     setIsNearCupola(distance < 6)
   })
 
-  // Manejo de tecla G para abrir galería
+  // Manejo de tecla G para abrir galería - SOLO cuando NO esté abierta
   useEffect(() => {
     const handleKeyPress = (e) => {
-      if (e.code === 'KeyG' && isNearCupola) {
+      if (e.code === 'KeyG' && isNearCupola && !isGalleryOpen) {
         e.preventDefault()
         onImageGalleryRequest()
       }
@@ -36,15 +36,18 @@ export function CupolaGallery({ onImageGalleryRequest }) {
 
     window.addEventListener('keydown', handleKeyPress)
     return () => window.removeEventListener('keydown', handleKeyPress)
-  }, [isNearCupola, onImageGalleryRequest])
+  }, [isNearCupola, onImageGalleryRequest, isGalleryOpen])
+
+  // DEBUG: Console log para verificar estados
+  console.log('CupolaGallery - isNearCupola:', isNearCupola, 'isGalleryOpen:', isGalleryOpen)
 
   return (
     <group>
       {/* CÚPULA PROFESIONAL MEJORADA */}
       <group ref={galleryRef} position={cupolaPosition}>
         
-        {/* INDICADOR VISUAL DE GALERÍA MEJORADO */}
-        {isNearCupola && (
+        {/* INDICADOR VISUAL SOLO CUANDO ESTÁ CERCA Y LA GALERÍA NO ESTÁ ABIERTA */}
+        {(isNearCupola && !isGalleryOpen) && (
           <group position={[0, 1.2, 0]}>
             
             {/* Partículas flotantes */}
@@ -66,8 +69,8 @@ export function CupolaGallery({ onImageGalleryRequest }) {
               )
             })}
             
-            {/* Texto flotante 3D mejorado */}
-            <Html position= {[0,-2,0]} center>
+            {/* Texto flotante 3D mejorado CON Z-INDEX BAJO */}
+            <Html position= {[0,-2,0]} center style={{ pointerEvents: 'none' }} zIndexRange={[1, 1]}>
               <div style={{
                 color: '#00ffff',
                 fontSize: '20px',
@@ -79,14 +82,16 @@ export function CupolaGallery({ onImageGalleryRequest }) {
                 padding: '15px 20px',
                 borderRadius: '15px',
                 border: '3px solid #00ffff',
-                boxShadow: '0 0 20px rgba(0,255,255,0.4), inset 0 0 20px rgba(0,255,255,0.1)'
+                boxShadow: '0 0 20px rgba(0,255,255,0.4), inset 0 0 20px rgba(0,255,255,0.1)',
+                position: 'relative',
+                zIndex: 1
               }}>
                 🖼️ GALERÍA DE IMÁGENES<br/>
                 <span style={{fontSize: '16px', color: '#ffffff'}}>
-                  Presiona G para explorar
+                  Press G to explore
                 </span>
                 <div style={{fontSize: '12px', marginTop: '5px', opacity: 0.8}}>
-                  Vista panorámica de la Tierra
+                  Panoramic view of Earth
                 </div>
               </div>
             </Html>
@@ -94,10 +99,8 @@ export function CupolaGallery({ onImageGalleryRequest }) {
         )}
       </group>
 
-      
-
-      {/* FLECHA INDICADORA MEJORADA */}
-      {!isNearCupola && camera.position.y < 6 && (
+      {/* FLECHA INDICADORA MEJORADA - Solo cuando NO está cerca y NO está abierta la galería */}
+      {!isNearCupola && !isGalleryOpen && camera.position.y < 6 && (
         <Html position={[4, 6.5, 0]} center>
           <div style={{
       width: '300px',
@@ -136,7 +139,7 @@ export function CupolaGallery({ onImageGalleryRequest }) {
             alignItems:'center', justifyContent:'center', fontWeight:700
           }}>1</span>
           <div>
-            Presiona <b>U</b> para <b>salir</b> de la vista (volver al modo de movimiento).
+            Press <b>U</b> to <b>exit</b> the view (return to movement mode).
           </div>
         </li>
 
@@ -146,7 +149,7 @@ export function CupolaGallery({ onImageGalleryRequest }) {
             alignItems:'center', justifyContent:'center', fontWeight:700
           }}>2</span>
           <div>
-            Usa <b>ESPACIO</b> para <b>subir</b> a la cúpula (una vez hayas salido).
+            Use <b>ESPACE</b> to <b>climb</b> to the cupola (once you've left).
           </div>
         </li>
 
@@ -156,7 +159,7 @@ export function CupolaGallery({ onImageGalleryRequest }) {
             alignItems:'center', justifyContent:'center', fontWeight:700
           }}>3</span>
           <div>
-            Cuando estés cerca de la cúpula, presiona <b>G</b> para ver imágenes.
+           When you're near the cupola, press <b>G</b> to view images. 
           </div>
         </li>
       </ol>
@@ -175,6 +178,16 @@ export function CupolaGallery({ onImageGalleryRequest }) {
         60% { 
           transform: translateY(-6px);
           text-shadow: 0 0 15px #00ffff;
+        }
+      }
+      @keyframes pulseGlow {
+        0%, 100% { 
+          transform: scale(1); 
+          box-shadow: 0 0 20px rgba(0,255,255,0.4), inset 0 0 20px rgba(0,255,255,0.1);
+        }
+        50% { 
+          transform: scale(1.02); 
+          box-shadow: 0 0 30px rgba(0,255,255,0.6), inset 0 0 30px rgba(0,255,255,0.2);
         }
       }
     `}</style>

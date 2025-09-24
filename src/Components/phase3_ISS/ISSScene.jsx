@@ -19,41 +19,68 @@ export function ISSScene() {
   // Lista de imágenes para la galería de la cúpula
   const cupolaImages = [
     {
-      id: 'earth_view',
-      src: '/images/earth_from_iss.jpg',
-      title: 'Vista de la Tierra desde la ISS',
-      description: 'Imagen capturada desde la Estación Espacial Internacional mostrando nuestro planeta azul con sus características nubes y océanos.'
+      id: 'Hurricane_Franklin',
+      position: [0, 9, 1.4],
+      rotation: [0, 0, 0],
+      src: '/images/Hurricane_Franklin.jpg',
+      title: 'Hurricane Franklin in the Atlantic Ocean'
     },
     {
-      id: 'aurora',
-      src: '/images/aurora_from_space.jpg',
-      title: 'Aurora Boreal desde el Espacio',
-      description: 'Las auroras vistas desde la ISS muestran el campo magnético terrestre en acción, creando estas cortinas luminosas espectaculares.'
+      id: 'Hurricane_Genevieve',
+      src: '/images/Hurricane_Genevieve.jpg',
+      title: 'Hurricane Genevieve off the Pacific coast of Mexico'
     },
     {
-      id: 'city_lights',
-      src: '/images/city_lights_night.jpg',
-      title: 'Luces Nocturnas de las Ciudades',
-      description: 'Las ciudades iluminadas por la noche revelan patrones de actividad humana y el impacto de la civilización en el planeta.'
+      id: 'Hurricane_Beryls',
+      src: '/images/Hurricane_Beryl.jpg',
+      title: 'Hurricane_Beryl_pictured_as_a_Cat_gory_5_storm'
     },
     {
-      id: 'hurricane',
-      src: '/images/hurricane_from_space.jpg',
-      title: 'Huracán visto desde el Espacio',
-      description: 'Los astronautas pueden observar y documentar fenómenos meteorológicos extremos, ayudando en la predicción del clima.'
+      id: 'Wildfires_burn',
+      src: '/images/Wildfires_burn.jpg',
+      title: 'Wildfires burn throughout Canada´s central provinces'
     },
     {
-      id: 'solar_panels',
-      src: '/images/iss_solar_panels.jpg',
-      title: 'Paneles Solares de la ISS',
-      description: 'Los paneles solares de la ISS generan la energía necesaria para todas las operaciones de la estación espacial.'
+      id: 'Wildfires_breakout',
+      src: '/images/Wildfires_breakout.jpg',
+      title: 'Wildfires breakout near the Greek village of Feneos'
     },
     {
-      id: 'spacewalk',
-      src: '/images/spacewalk_iss.jpg',
-      title: 'Caminata Espacial',
-      description: 'Los astronautas realizan actividades extravehiculares para mantener y actualizar los sistemas de la ISS.'
+      id: 'The_Moon',
+      src: '/images/The_Moon.jpg',
+      title: 'The Moon´s shadow covers portions of Canada and the U.S.'
+    },
+    {
+      id: 'The_Nigth_New_york',
+      src: '/images/The_Nigth_New_york.jpg',
+      title: 'The night lights of the New York-New Jersey metropolitan area'
+    },
+    {
+      id: 'The_Nigth_Tokyo',
+      src: '/images/The_Nigth_Tokyo.jpg',
+      title: 'Tokyo, Japan, the world’s most populous metropolitan area with about 39.1 million people'
+    },
+    {
+      id: 'Baghdad',
+      src: '/images/Baghdad.jpg',
+      title: 'Baghdad, Iraq, split by the Tigris River and with a population of about 7.92 million'
+  
+    },
+    {
+      id: 'Hadfield',
+      src: '/images/Hadfield.jpg',
+      title: 'Hadfield uses still camera in the Cupola Module'
+  
+    },
+    {
+      id: 'Anne',
+      src: '/images/Anne.jpg',
+      title: 'NASA astronaut Anne McClain poses for a portrait inside the cupola'
+  
     }
+
+
+
   ]
 
   // Habilitar audio desde el primer clic en cualquier lugar
@@ -98,22 +125,26 @@ export function ISSScene() {
     return () => window.removeEventListener('keydown', handleEscape)
   }, [currentVideo, showImageGallery])
 
-  // Navegación de galería con flechas
+  // Navegación de galería con flechas - NAVEGACIÓN CIRCULAR CORREGIDA
   useEffect(() => {
     if (!showImageGallery) return
 
     const handleArrowKeys = (e) => {
       if (e.code === 'ArrowLeft' || e.code === 'KeyA') {
         e.preventDefault()
-        setCurrentImageIndex((prev) => 
-          prev > 0 ? prev - 1 : cupolaImages.length - 1
-        )
+        setCurrentImageIndex((prev) => {
+          const newIndex = prev > 0 ? prev - 1 : cupolaImages.length - 1
+          console.log('Navigate left - current:', prev, 'new:', newIndex)
+          return newIndex
+        })
       }
       if (e.code === 'ArrowRight' || e.code === 'KeyD') {
         e.preventDefault()
-        setCurrentImageIndex((prev) => 
-          prev < cupolaImages.length - 1 ? prev + 1 : 0
-        )
+        setCurrentImageIndex((prev) => {
+          const newIndex = prev < cupolaImages.length - 1 ? prev + 1 : 0
+          console.log('Navigate right - current:', prev, 'new:', newIndex)
+          return newIndex
+        })
       }
     }
 
@@ -170,16 +201,21 @@ export function ISSScene() {
     setShowImageGallery(false)
   }
 
+  // NAVEGACIÓN CIRCULAR MEJORADA CON DEBUG
   const nextImage = () => {
-    setCurrentImageIndex((prev) => 
-      prev < cupolaImages.length - 1 ? prev + 1 : 0
-    )
+    setCurrentImageIndex((prev) => {
+      const newIndex = prev < cupolaImages.length - 1 ? prev + 1 : 0
+      console.log('Next button - current:', prev, 'new:', newIndex, 'total images:', cupolaImages.length)
+      return newIndex
+    })
   }
 
   const prevImage = () => {
-    setCurrentImageIndex((prev) => 
-      prev > 0 ? prev - 1 : cupolaImages.length - 1
-    )
+    setCurrentImageIndex((prev) => {
+      const newIndex = prev > 0 ? prev - 1 : cupolaImages.length - 1
+      console.log('Prev button - current:', prev, 'new:', newIndex, 'total images:', cupolaImages.length)
+      return newIndex
+    })
   }
 
   // Si el video intro no ha terminado, mostrarlo
@@ -234,8 +270,11 @@ export function ISSScene() {
             />
           ))}
           
-          {/* Galería de imágenes de la cúpula */}
-          <CupolaGallery onImageGalleryRequest={handleImageGalleryRequest} />
+          {/* Galería de imágenes de la cúpula - PASAMOS EL ESTADO */}
+          <CupolaGallery 
+            onImageGalleryRequest={handleImageGalleryRequest}
+            isGalleryOpen={showImageGallery}
+          />
           
           {/* Jugador con controles de microgravedad */}
           <ISSPlayerControls>
@@ -342,7 +381,7 @@ export function ISSScene() {
         </div>
       )}
 
-      {/* GALERÍA DE IMÁGENES MODAL */}
+      {/* GALERÍA DE IMÁGENES MODAL - TAMAÑO MEJORADO */}
       {showImageGallery && (
         <div style={{
           position: 'fixed',
@@ -380,7 +419,7 @@ export function ISSScene() {
             Imagen {currentImageIndex + 1} de {cupolaImages.length}
           </div>
 
-          {/* Contenedor de imagen */}
+          {/* Contenedor de imagen - MEJORADO PARA OCUPAR MÁS ESPACIO */}
           <div style={{
             position: 'relative',
             width: '90vw',
@@ -393,21 +432,55 @@ export function ISSScene() {
             overflow: 'hidden',
             background: '#111111'
           }}>
-            {/* Imagen actual */}
+            {/* Imagen actual - OBJECT-FIT MEJORADO CON MEJOR MANEJO DE ERRORES */}
             <img
+              key={currentImageIndex} // Forzar re-render cuando cambia el índice
               src={cupolaImages[currentImageIndex].src}
               alt={cupolaImages[currentImageIndex].title}
               style={{
-                maxWidth: '100%',
-                maxHeight: '100%',
-                objectFit: 'contain',
-                borderRadius: '10px'
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover', // Cambiado a 'cover' para ocupar todo el espacio
+                objectPosition: 'center', // Centra la imagen
+                borderRadius: '10px',
+                display: 'block' // Asegura que se muestre por defecto
+              }}
+              onLoad={(e) => {
+                // Asegura que la imagen se muestre cuando carga correctamente
+                e.target.style.display = 'block'
+                if (e.target.nextSibling) {
+                  e.target.nextSibling.style.display = 'none'
+                }
+                console.log('Image loaded successfully:', cupolaImages[currentImageIndex].src)
               }}
               onError={(e) => {
-                // Fallback si la imagen no carga
+                // Fallback si la imagen no carga - mostrar placeholder
+                console.error('Image failed to load:', cupolaImages[currentImageIndex].src)
                 e.target.style.display = 'none'
+                if (e.target.nextSibling) {
+                  e.target.nextSibling.style.display = 'flex'
+                }
               }}
             />
+
+            {/* Placeholder mejorado cuando la imagen no carga */}
+            <div style={{
+              display: 'none',
+              width: '100%',
+              height: '100%',
+              backgroundColor: '#1a1a2e',
+              justifyContent: 'center',
+              alignItems: 'center',
+              flexDirection: 'column',
+              color: '#ffffff',
+              fontSize: '18px'
+            }}>
+              <div style={{ fontSize: '48px', marginBottom: '20px' }}>🖼️</div>
+              <div>Imagen no disponible</div>
+              <div style={{ fontSize: '14px', marginTop: '10px', opacity: 0.7 }}>
+                {cupolaImages[currentImageIndex].title}
+              </div>
+            </div>
 
             {/* Botones de navegación */}
             <button
@@ -425,8 +498,11 @@ export function ISSScene() {
                 cursor: 'pointer',
                 fontSize: '24px',
                 fontWeight: 'bold',
-                boxShadow: '0 4px 8px rgba(0,0,0,0.3)'
+                boxShadow: '0 4px 8px rgba(0,0,0,0.3)',
+                transition: 'all 0.3s ease'
               }}
+              onMouseOver={(e) => e.target.style.background = 'rgba(0,150,255,0.9)'}
+              onMouseOut={(e) => e.target.style.background = 'rgba(0,100,200,0.8)'}
             >
               ←
             </button>
@@ -446,8 +522,11 @@ export function ISSScene() {
                 cursor: 'pointer',
                 fontSize: '24px',
                 fontWeight: 'bold',
-                boxShadow: '0 4px 8px rgba(0,0,0,0.3)'
+                boxShadow: '0 4px 8px rgba(0,0,0,0.3)',
+                transition: 'all 0.3s ease'
               }}
+              onMouseOver={(e) => e.target.style.background = 'rgba(0,150,255,0.9)'}
+              onMouseOut={(e) => e.target.style.background = 'rgba(0,100,200,0.8)'}
             >
               →
             </button>
