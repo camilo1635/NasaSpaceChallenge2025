@@ -56,7 +56,7 @@ export function IntroVideo({ onVideoEnd, videoEnded }) {
         textShadow: '2px 2px 4px rgba(0,0,0,0.8)',
         zIndex: 1000001
       }}>
-        🛸 Bienvenido a la Estación Espacial Internacional
+        🛸 Welcome to the International Space Station
       </div>
 
       {/* Video principal */}
@@ -116,28 +116,8 @@ export function IntroVideo({ onVideoEnd, videoEnded }) {
           e.target.style.borderColor = 'rgba(255,255,255,0.5)'
         }}
       >
-        Saltar ⏭️
+        Skip ⏭️
       </button>
-
-      {/* Indicador de carga */}
-      <div style={{
-        position: 'absolute',
-        bottom: '100px',
-        left: '50%',
-        transform: 'translateX(-50%)',
-        width: '300px',
-        height: '4px',
-        background: 'rgba(255,255,255,0.2)',
-        borderRadius: '2px',
-        overflow: 'hidden'
-      }}>
-        <div style={{
-          width: '100%',
-          height: '100%',
-          background: 'linear-gradient(90deg, #4da6ff, #87ceeb)',
-          animation: 'loading 20s linear infinite'
-        }} />
-      </div>
 
       <style>{`
         @keyframes loading {
