@@ -8,6 +8,7 @@ import {NBLScene} from './Components/phase2_NBL/NBLScene' // Importamos la nueva
 import LoadingScreen from './Components/Shared/UI/LoadingScreen'
 import { ISSScene } from './Components/phase3_ISS/ISSScene'
 import { GlobalIntroVideo } from './Components/Shared/UI/GlobalIntroVideo' // Nuevo video inicial
+import { SoundManager } from './Components/Shared/Audio/SoundManager' // Sistema de audio
 import './App.css'
 
 // ========================== 
@@ -126,7 +127,6 @@ function GameRenderer() {
         setIsTransitioning(false)
         setTransitionPhase(0)
         setPendingPhase(null)
-        setCountdownNumber(3) // Reset para próxima vez
       }, 15000)
       
     } else {
@@ -175,10 +175,12 @@ function GameRenderer() {
     // Si se está mostrando el video intro después del menú
     if (showGlobalIntro) {
       return (
-        <GlobalIntroVideo 
-          onVideoEnd={handleGlobalIntroEnd}
-          videoEnded={globalIntroEnded}
-        />
+        <div className="global-intro-video">
+          <GlobalIntroVideo 
+            onVideoEnd={handleGlobalIntroEnd}
+            videoEnded={globalIntroEnded}
+          />
+        </div>
       )
     }
 
@@ -226,6 +228,9 @@ function GameRenderer() {
       {/* Render de la fase actual */}
       {renderCurrentPhase()}
 
+      {/* COMPONENTE DE AUDIO - Se renderiza siempre pero internamente maneja cuándo mostrar controles */}
+      <SoundManager />
+
       {/* Debug info simplificado - No mostrar durante el menú o video inicial */}
       {import.meta.env.DEV && !isTransitioning && !showGlobalIntro && state.currentPhase !== 'menu' && (
         <div className="debug-info">
@@ -240,6 +245,7 @@ function GameRenderer() {
       {/* TRANSICIÓN DE COHETE (NBL -> ISS) */}
       {isTransitioning && pendingPhase === 'iss' && state.currentPhase === 'nbl' && (
         <div 
+          className="game-transition rocket-transition"
           style={{
             position: 'fixed',
             top: 0,
@@ -261,7 +267,7 @@ function GameRenderer() {
             pointerEvents: 'all'
           }}>
           
-          {/* Phase 2: Launch preparation WITH COUNTDOWN */}
+          {/* Phase 2: Launch preparation */}
           {transitionPhase === 2 && (
             <div style={{
               textAlign: 'center',
@@ -463,6 +469,7 @@ function GameRenderer() {
       {/* ORIGINAL WATER TRANSITION (for other transitions) */}
       {isTransitioning && pendingPhase === 'nbl' && (
         <div 
+          className="game-transition water-transition"
           style={{
             position: 'fixed',
             top: 0,
