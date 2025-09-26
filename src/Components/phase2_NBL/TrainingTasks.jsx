@@ -22,9 +22,8 @@ function DockingRing(props) {
 }
 
 /* 🔹 NBL BLOCK (satellite piece) */
-function NBLBlock({ blockData, onGrab, onRelease, isGrabbed, grabPosition, isConnected, finalPosition }) {
+function NBLBlock({ blockData, onGrab, onRelease, isGrabbed, grabPosition, isConnected, finalPosition, playerPosition }) {
   const blockRef = useRef()
-  const { camera } = useThree()
   const [isNearby, setIsNearby] = useState(false)
 
   useFrame(() => {
@@ -46,11 +45,16 @@ function NBLBlock({ blockData, onGrab, onRelease, isGrabbed, grabPosition, isCon
       blockRef.current.rotation.y += 0.005
     }
 
-    const dx = camera.position.x - blockRef.current.position.x
-    const dy = camera.position.y - blockRef.current.position.y
-    const dz = camera.position.z - blockRef.current.position.z
-    const distance = Math.sqrt(dx*dx + dy*dy + dz*dz)
-    setIsNearby(distance < 4)
+    // 🔥 FIXED: Use actual player position instead of camera position
+    if (playerPosition) {
+      const dx = playerPosition.x - blockRef.current.position.x
+      const dy = playerPosition.y - blockRef.current.position.y
+      const dz = playerPosition.z - blockRef.current.position.z
+      const distance = Math.sqrt(dx*dx + dy*dy + dz*dz)
+      
+      // Increased detection range for better UX with slower movement
+      setIsNearby(distance < 1.5)
+    }
   })
 
   useEffect(() => {
@@ -167,6 +171,30 @@ function ConnectionPoint({ position, isActive, onConnect }) {
   )
 }
 
+/* 🔹 PLAYER POSITION TRACKER */
+function PlayerTracker({ onPlayerPositionUpdate }) {
+  const { camera } = useThree()
+  const playerPositionRef = useRef(new THREE.Vector3())
+
+  useFrame(() => {
+    // Calculate player position from camera position with offset
+    // Since camera is behind player by offset (0, 2.5, 4) approximately
+    const forward = new THREE.Vector3()
+    camera.getWorldDirection(forward)
+    
+    // Estimate player position (camera is behind and above)
+    const estimatedPlayerPos = camera.position
+      .clone()
+      .add(forward.multiplyScalar(4)) // Move forward from camera
+      .add(new THREE.Vector3(0, -2, 0)) // Move down from camera
+    
+    playerPositionRef.current.copy(estimatedPlayerPos)
+    onPlayerPositionUpdate(playerPositionRef.current)
+  })
+
+  return null
+}
+
 /* 🔹 MAIN COMPONENT */
 export function TrainingTasks() {
   const { dispatch } = useGameState()
@@ -175,6 +203,7 @@ export function TrainingTasks() {
   const [connectedBlocks, setConnectedBlocks] = useState([])
   const [currentStep, setCurrentStep] = useState(1)
   const [showCompletion, setShowCompletion] = useState(false)
+  const [playerPosition, setPlayerPosition] = useState(new THREE.Vector3())
   const { camera, gl } = useThree()
 
   // Only 3 pieces
@@ -250,7 +279,7 @@ export function TrainingTasks() {
     const validPoint = connectionPoints.find(point => 
       point.expectedType === block.type && 
       point.step === currentStep &&
-      position.distanceTo(new THREE.Vector3(...point.position)) < 3.5 // Increased detection range
+      position.distanceTo(new THREE.Vector3(...point.position)) < 3.5 // Increased connection range
     )
 
     if (validPoint) {
@@ -285,8 +314,15 @@ export function TrainingTasks() {
     return connectedBlocks.find(conn => conn.blockId === blockId)
   }
 
+  const handlePlayerPositionUpdate = (position) => {
+    setPlayerPosition(position)
+  }
+
   return (
     <group>
+      {/* 🔥 PLAYER POSITION TRACKER */}
+      <PlayerTracker onPlayerPositionUpdate={handlePlayerPositionUpdate} />
+
       {/* Construction base - more visible platform */}
       <mesh position={[0, 0.5, -3]} castShadow receiveShadow>
         <boxGeometry args={[5, 0.2, 3]} />
@@ -320,6 +356,7 @@ export function TrainingTasks() {
             grabPosition={grabbedBlock === block.id ? grabbedPosition : null}
             isConnected={!!connectionInfo}
             finalPosition={connectionInfo?.finalPosition}
+            playerPosition={playerPosition} // 🔥 Pass real player position
           />
         )
       })}
