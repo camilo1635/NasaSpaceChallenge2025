@@ -194,8 +194,8 @@ export function ISSScene() {
         setShowExperimentGallery(false)
       }
       
-      // D - Experimentos científicos
-      if (e.code === 'KeyD') {
+      // J - Experimentos científicos
+      if (e.code === 'KeyJ') {
         e.preventDefault()
         setShowExperimentGallery(true)
         setCurrentExperimentIndex(0)
@@ -522,6 +522,7 @@ export function ISSScene() {
             background: '#111111'
           }}>
             <video
+              key={`video-${currentVideoIndex}`} // Clave única para forzar recreación
               controls
               autoPlay
               style={{
