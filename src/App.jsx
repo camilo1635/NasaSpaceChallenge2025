@@ -8,6 +8,7 @@ import {NBLScene} from './Components/phase2_NBL/NBLScene' // Importamos la nueva
 import LoadingScreen from './Components/Shared/UI/LoadingScreen'
 import { ISSScene } from './Components/phase3_ISS/ISSScene'
 import { GlobalIntroVideo } from './Components/Shared/UI/GlobalIntroVideo' // Nuevo video inicial
+import { SoundManager } from './Components/Shared/Audio/SoundManager' // Sistema de audio
 import './App.css'
 
 // ========================== 
@@ -47,20 +48,45 @@ function GameRenderer() {
   // Listener para saltar con tecla (ejemplo: "N")
   useEffect(() => {
     const handleKeyDown = (e) => {
+      // Skip desde museum a NBL
       if (e.key.toLowerCase() === 'n' && state.currentPhase === 'museum') {
-        console.log('Skipping museum, going to NBL...')
+        console.log('Skipping to NBL...')
         startTransitionTo('nbl')
       }
-      // Tecla I para ir directamente a ISS (para testing)
+      // Skip desde NBL a ISS
       if (e.key.toLowerCase() === 'i' && import.meta.env.DEV) {
         console.log('Skipping to ISS...')
-        startTransitionTo('iss')
+        if (window.startGlobalTransition) {
+        window.startGlobalTransition('iss') 
+        }
+      }
+      // Para desarrollo: teclas de debug
+      if (import.meta.env.DEV) {
+        // M para volver al menú desde cualquier fase
+        if (e.key.toLowerCase() === 'm') {
+          console.log('Returning to menu...')
+          dispatch({ type: 'SET_PHASE', payload: 'menu' })
+          setIsTransitioning(false)
+        }
+        // Saltos directos con números
+        if (e.key === '1') {
+          console.log('Jump to Museum')
+          dispatch({ type: 'SET_PHASE', payload: 'museum' })
+        }
+        if (e.key === '2') {
+          console.log('Jump to NBL')
+          dispatch({ type: 'SET_PHASE', payload: 'nbl' })
+        }
+        if (e.key === '3') {
+          console.log('Jump to ISS')
+          dispatch({ type: 'SET_PHASE', payload: 'iss' })
+        }
       }
     }
 
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [state.currentPhase])
+  }, [state.currentPhase, dispatch])
 
   // Función para iniciar transición global
   const startTransitionTo = (targetPhase) => {
@@ -90,15 +116,10 @@ function GameRenderer() {
       }, 6000)
       
       setTimeout(() => {
-        console.log('Phase 5: Approaching ISS')
-        setTransitionPhase(5)
-      }, 9000)
-      
-      setTimeout(() => {
         console.log(`Arriving at ISS`)
         window.isTransitioningToISS = true // Flag para no mostrar intro de ISS
         dispatch({ type: 'SET_PHASE', payload: targetPhase })
-      }, 13500) // Tiempo extendido para completar animación
+      }, 14000) // Tiempo extendido para completar animación
       
       setTimeout(() => {
         console.log('Transition completed')
@@ -106,7 +127,6 @@ function GameRenderer() {
         setIsTransitioning(false)
         setTransitionPhase(0)
         setPendingPhase(null)
-        setCountdownNumber(3) // Reset para próxima vez
       }, 15000)
       
     } else {
@@ -155,10 +175,12 @@ function GameRenderer() {
     // Si se está mostrando el video intro después del menú
     if (showGlobalIntro) {
       return (
-        <GlobalIntroVideo 
-          onVideoEnd={handleGlobalIntroEnd}
-          videoEnded={globalIntroEnded}
-        />
+        <div className="global-intro-video">
+          <GlobalIntroVideo 
+            onVideoEnd={handleGlobalIntroEnd}
+            videoEnded={globalIntroEnded}
+          />
+        </div>
       )
     }
 
@@ -206,19 +228,24 @@ function GameRenderer() {
       {/* Render de la fase actual */}
       {renderCurrentPhase()}
 
+      {/* COMPONENTE DE AUDIO - Se renderiza siempre pero internamente maneja cuándo mostrar controles */}
+      <SoundManager />
+
       {/* Debug info simplificado - No mostrar durante el menú o video inicial */}
       {import.meta.env.DEV && !isTransitioning && !showGlobalIntro && state.currentPhase !== 'menu' && (
         <div className="debug-info">
           <p>Phase: {state.currentPhase}</p>
           <p>Player: {state.playerName}</p>
-          <p>Press 'N' to skip to NBL</p>
-          <p>Press 'I' to skip to ISS</p>
+          {state.currentPhase === 'museum' && <p>Press 'N' to skip to NBL</p>}
+          {state.currentPhase === 'nbl' && <p>Press 'I' to skip to ISS</p>}
+          <p>Dev Keys: M=Menu | 1=Museum | 2=NBL | 3=ISS</p>
         </div>
       )}
 
       {/* TRANSICIÓN DE COHETE (NBL -> ISS) */}
       {isTransitioning && pendingPhase === 'iss' && state.currentPhase === 'nbl' && (
         <div 
+          className="game-transition rocket-transition"
           style={{
             position: 'fixed',
             top: 0,
@@ -240,7 +267,7 @@ function GameRenderer() {
             pointerEvents: 'all'
           }}>
           
-          {/* Phase 2: Launch preparation WITH COUNTDOWN */}
+          {/* Phase 2: Launch preparation */}
           {transitionPhase === 2 && (
             <div style={{
               textAlign: 'center',
@@ -436,107 +463,13 @@ function GameRenderer() {
               }} />
             </>
           )}
-
-          {/* Phase 5: Approaching ISS */}
-          {transitionPhase === 5 && (
-            <>
-              {/* Background stars */}
-              <div style={{
-                position: 'absolute',
-                width: '100%',
-                height: '100%'
-              }}>
-                {[...Array(50)].map((_, i) => (
-                  <div
-                    key={i}
-                    style={{
-                      position: 'absolute',
-                      left: `${Math.random() * 100}%`,
-                      top: `${Math.random() * 100}%`,
-                      width: '1px',
-                      height: '1px',
-                      background: '#fff',
-                      borderRadius: '50%'
-                    }}
-                  />
-                ))}
-              </div>
-              
-              {/* ISS approaching */}
-              <div style={{
-                textAlign: 'center',
-                animation: 'issApproach 2s ease-out forwards',
-                zIndex: 1000001
-              }}>
-                <div style={{ 
-                  fontSize: '20px',
-                  animation: 'issGrow 2s ease-out forwards',
-                  filter: 'drop-shadow(0 0 20px rgba(255,255,255,0.8))'
-                }}>
-                  🛸
-                </div>
-                
-                <h1 style={{
-                  color: '#fff',
-                  fontSize: '42px',
-                  marginTop: '30px',
-                  textShadow: '3px 3px 6px rgba(0,0,0,0.8)',
-                  animation: 'fadeIn 1.5s ease-out'
-                }}>
-                  ARRIVING AT ISS
-                </h1>
-                
-                <p style={{
-                  color: '#00ffff',
-                  fontSize: '24px',
-                  marginTop: '20px',
-                  animation: 'fadeIn 2s ease-out'
-                }}>
-                  Preparing docking...
-                </p>
-                
-                {/* Docking indicators */}
-                <div style={{
-                  display: 'flex',
-                  justifyContent: 'center',
-                  gap: '20px',
-                  marginTop: '30px',
-                  animation: 'fadeIn 2.5s ease-out'
-                }}>
-                  {['Pressure', 'Alignment', 'Speed'].map((item, i) => (
-                    <div key={i} style={{
-                      padding: '10px 20px',
-                      background: 'rgba(0,255,0,0.2)',
-                      border: '2px solid #00ff00',
-                      borderRadius: '8px',
-                      color: '#00ff00',
-                      fontSize: '14px'
-                    }}>
-                      ✓ {item}
-                    </div>
-                  ))}
-                </div>
-              </div>
-              
-              {/* Small rocket approaching */}
-              <div style={{
-                position: 'absolute',
-                bottom: '10%',
-                left: '20%',
-                fontSize: '40px',
-                transform: 'rotate(45deg)',
-                animation: 'rocketDock 2s ease-out forwards'
-              }}>
-                🚀
-              </div>
-            </>
-          )}
         </div>
       )}
 
       {/* ORIGINAL WATER TRANSITION (for other transitions) */}
       {isTransitioning && pendingPhase === 'nbl' && (
         <div 
+          className="game-transition water-transition"
           style={{
             position: 'fixed',
             top: 0,
