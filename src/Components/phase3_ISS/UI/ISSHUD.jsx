@@ -2,226 +2,182 @@
 import React, { useState, useEffect } from 'react'
 
 export function ISSHUD() {
-  const [showControls, setShowControls] = useState(true)
-  const [discoveredVideos] = useState(0)
-  const [discoveredImages] = useState(0)
+  const [isExternalView, setIsExternalView] = useState(false)
 
-  // Ocultar controles después de unos segundos
+  // Detectar si está en vista externa
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setShowControls(false)
-    }, 12000) // Más tiempo para leer las nuevas instrucciones
+    const handleKeyPress = (e) => {
+      if (e.code === 'KeyP') {
+        setIsExternalView(true)
+      }
+      if (e.code === 'KeyO' || e.code === 'KeyU') {
+        setIsExternalView(false)
+      }
+    }
 
-    return () => clearTimeout(timer)
+    window.addEventListener('keydown', handleKeyPress)
+    return () => window.removeEventListener('keydown', handleKeyPress)
   }, [])
 
-  const toggleControls = () => {
-    setShowControls(!showControls)
+  // No mostrar HUD en vista externa
+  if (isExternalView) {
+    return null
   }
 
   return (
-    <div style={{ position: 'relative', width: '100%', height: '100%' }}>
-      {/* Botón para mostrar/ocultar controles */}
-      <button
-        onClick={toggleControls}
-        style={{
-          position: 'absolute',
-          top: '20px',
-          right: '20px',
-          background: 'rgba(0,50,100,0.8)',
-          border: '2px solid #00ffff',
-          color: '#fff',
-          padding: '8px 12px',
-          borderRadius: '8px',
-          cursor: 'pointer',
-          fontSize: '14px',
-          zIndex: 1000,
-          transition: 'all 0.3s ease'
-        }}
-        onMouseOver={(e) => {
-          e.target.style.background = 'rgba(0,100,150,0.9)'
-          e.target.style.transform = 'scale(1.05)'
-        }}
-        onMouseOut={(e) => {
-          e.target.style.background = 'rgba(0,50,100,0.8)'
-          e.target.style.transform = 'scale(1)'
-        }}
-      >
-        {showControls ? 'Ocultar' : 'Controles'}
-      </button>
-
-      {/* Panel de controles */}
-      {showControls && (
-        <div style={{
-          position: 'absolute',
-          top: '20px',
-          left: '20px',
-          background: 'rgba(0,20,40,0.95)',
-          color: '#fff',
-          padding: '20px',
-          borderRadius: '15px',
-          fontSize: '14px',
-          border: '2px solid #00ffff',
-          maxWidth: '380px',
-          boxShadow: '0 10px 25px rgba(0,0,0,0.5)',
-          zIndex: 999,
-          animation: 'slideIn 0.5s ease'
-        }}>
-          <h3 style={{ 
-            margin: '0 0 15px', 
-            color: '#00ffff', 
-            fontSize: '18px',
-            textAlign: 'center'
-          }}>
-            Estación Espacial Internacional
-          </h3>
-          
-          <div style={{ marginBottom: '15px' }}>
-            <h4 style={{ margin: '0 0 8px', color: '#ffff99', fontSize: '14px' }}>
-              Controles de Microgravedad:
-            </h4>
-            <div style={{ fontSize: '12px', lineHeight: '1.4' }}>
-              <div><strong>WASD</strong> - Propulsores de movimiento</div>
-              <div><strong>ESPACIO</strong> - Propulsor hacia arriba</div>
-              <div><strong>SHIFT</strong> - Propulsor hacia abajo</div>
-              <div><strong>Mouse</strong> - Orientación (clic para capturar)</div>
-            </div>
-          </div>
-
-          <div style={{ 
-            marginBottom: '15px',
-            padding: '8px',
-            background: 'rgba(0,255,255,0.1)',
-            borderRadius: '6px',
-            border: '1px solid rgba(0,255,255,0.3)'
-          }}>
-            <h4 style={{ margin: '0 0 8px', color: '#00ffff', fontSize: '14px' }}>
-              Vista Rápida a Cúpula:
-            </h4>
-            <div style={{ fontSize: '12px', lineHeight: '1.4' }}>
-              <div><strong>S</strong> - Centrar y mirar hacia la cúpula</div>
-              <div style={{ marginTop: '4px', opacity: 0.8, fontSize: '11px' }}>
-                Posiciona automáticamente al jugador en el centro<br/>
-                y orienta la vista hacia arriba para ver la cúpula
-              </div>
-              <div style={{ marginTop: '4px', opacity: 0.9, fontSize: '11px', color: '#ffff99' }}>
-                Presiona S nuevamente para volver al control normal
-              </div>
-            </div>
-          </div>
-
-          <div style={{ marginBottom: '15px' }}>
-            <h4 style={{ margin: '0 0 8px', color: '#ffff99', fontSize: '14px' }}>
-              Estaciones de Video:
-            </h4>
-            <div style={{ fontSize: '12px', lineHeight: '1.4' }}>
-              <div><strong>F</strong> - Ver video en pantalla completa</div>
-              <div><strong>ESC</strong> - Cerrar video</div>
-              <div style={{ marginTop: '5px', opacity: 0.8 }}>
-                Busca las pantallas grandes con títulos flotantes
-              </div>
-            </div>
-          </div>
-
-          <div style={{ marginBottom: '15px' }}>
-            <h4 style={{ margin: '0 0 8px', color: '#ffff99', fontSize: '14px' }}>
-              Galería de la Cúpula:
-            </h4>
-            <div style={{ fontSize: '12px', lineHeight: '1.4' }}>
-              <div><strong>G</strong> - Abrir galería de imágenes</div>
-              <div><strong>← →</strong> o <strong>A D</strong> - Navegar imágenes</div>
-              <div><strong>ESC</strong> - Cerrar galería</div>
-              <div style={{ marginTop: '5px', opacity: 0.8 }}>
-                Ve a la cúpula superior para acceder a las imágenes
-              </div>
-              <div style={{ marginTop: '3px', opacity: 0.9, fontSize: '11px', color: '#87ceeb' }}>
-                Tip: Usa la vista rápida (S) para llegar más fácil
-              </div>
-            </div>
-          </div>
-
-          <div style={{ 
-            padding: '10px', 
-            background: 'rgba(0,100,0,0.2)', 
-            borderRadius: '8px',
-            border: '1px solid rgba(0,255,0,0.3)'
-          }}>
-            <div style={{ fontSize: '13px', fontWeight: 'bold', marginBottom: '5px' }}>
-              Progreso de Exploración:
-            </div>
-            <div style={{ fontSize: '12px' }}>
-              Videos descubiertos: {discoveredVideos}/3
-            </div>
-            <div style={{ fontSize: '12px' }}>
-              Imágenes vistas: {discoveredImages}/6
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Indicador de misión */}
+    <div style={{ 
+      position: 'fixed', 
+      top: 0, 
+      left: 0, 
+      width: '100vw', 
+      height: '100vh', 
+      pointerEvents: 'none',
+      zIndex: 1000
+    }}>
+      {/* Panel de controles SIEMPRE VISIBLE en esquina superior izquierda */}
       <div style={{
         position: 'absolute',
-        bottom: '20px',
+        top: '20px',
         left: '20px',
-        background: 'rgba(0,30,60,0.9)',
+        background: 'rgba(0,20,40,0.9)',
         color: '#fff',
-        padding: '12px 20px',
-        borderRadius: '10px',
-        fontSize: '14px',
+        padding: '20px',
+        borderRadius: '12px',
+        fontSize: '13px',
         border: '2px solid #00ffff',
-        maxWidth: '400px'
+        maxWidth: '450px',
+        boxShadow: '0 8px 20px rgba(0,0,0,0.4)',
+        zIndex: 1001,
+        pointerEvents: 'auto'
       }}>
-        <div style={{ fontWeight: 'bold', marginBottom: '5px', color: '#00ffff' }}>
-          Misión: Exploración Educativa
+        <h3 style={{ 
+          margin: '0 0 15px', 
+          color: '#00ffff', 
+          fontSize: '16px',
+          textAlign: 'center'
+        }}>
+          Estación Espacial Internacional
+        </h3>
+
+        {/* Contenido educativo disponible */}
+        <div style={{ marginBottom: '15px' }}>
+          <h4 style={{ margin: '0 0 10px', color: '#87ceeb', fontSize: '14px' }}>
+            Contenido Disponible:
+          </h4>
+          
+          <div style={{
+            background: 'rgba(0,150,255,0.15)', 
+            padding: '8px', 
+            borderRadius: '6px',
+            marginBottom: '6px',
+            border: '1px solid rgba(0,150,255,0.3)'
+          }}>
+            <div style={{ fontSize: '12px', fontWeight: 'bold', color: '#87ceeb' }}>
+              🖼️ <span style={{ color: '#00ffff' }}>G</span> - Galería de la Cúpula
+            </div>
+            <div style={{ fontSize: '11px', opacity: 0.8, marginTop: '2px' }}>
+              Imágenes panorámicas de la Tierra
+            </div>
+          </div>
+
+          <div style={{
+            background: 'rgba(255,140,0,0.15)', 
+            padding: '8px', 
+            borderRadius: '6px',
+            marginBottom: '6px',
+            border: '1px solid rgba(255,140,0,0.3)'
+          }}>
+            <div style={{ fontSize: '12px', fontWeight: 'bold', color: '#ffaa44' }}>
+              🎬 <span style={{ color: '#ffaa44' }}>F</span> - Vida en la ISS
+            </div>
+            <div style={{ fontSize: '11px', opacity: 0.8, marginTop: '2px' }}>
+              Videos sobre cómo viven los astronautas
+            </div>
+          </div>
+
+          <div style={{
+            background: 'rgba(0,255,100,0.15)', 
+            padding: '8px', 
+            borderRadius: '6px',
+            border: '1px solid rgba(0,255,100,0.3)'
+          }}>
+            <div style={{ fontSize: '12px', fontWeight: 'bold', color: '#44ff88' }}>
+              🔬 <span style={{ color: '#44ff88' }}>D</span> - Experimentos Científicos
+            </div>
+            <div style={{ fontSize: '11px', opacity: 0.8, marginTop: '2px' }}>
+              Investigación en microgravedad
+            </div>
+          </div>
         </div>
-        <div style={{ fontSize: '13px', opacity: 0.9 }}>
-          Descubre cómo viven y trabajan los astronautas en la ISS
+
+        {/* Controles de vista */}
+        <div style={{ marginBottom: '12px' }}>
+          <h4 style={{ margin: '0 0 8px', color: '#ffff99', fontSize: '12px' }}>
+            Controles de Vista:
+          </h4>
+          <div style={{ fontSize: '11px', lineHeight: '1.4', opacity: 0.9 }}>
+            <div><strong>P</strong> - Vista externa | <strong>O</strong> - Vista interna</div>
+            <div><strong>V</strong> - Vista cúpula | <strong>U</strong> - Reset</div>
+          </div>
         </div>
-        <div style={{ fontSize: '12px', marginTop: '8px', opacity: 0.7 }}>
-          Explora las estaciones de video y la galería de la cúpula
-        </div>
-        <div style={{ fontSize: '11px', marginTop: '5px', opacity: 0.8, color: '#87ceeb' }}>
-          Consejo: Usa "S" para acceder rápidamente a la vista de la cúpula
+
+        {/* Navegación */}
+        <div style={{ 
+          fontSize: '11px', 
+          opacity: 0.8, 
+          textAlign: 'center',
+          borderTop: '1px solid rgba(255,255,255,0.2)',
+          paddingTop: '8px'
+        }}>
+          En galerías: <strong>← →</strong> o <strong>A D</strong> navegar | <strong>ESC</strong> cerrar
         </div>
       </div>
 
-      {/* Información de la ISS */}
+      {/* Información de la ISS en esquina inferior derecha */}
       <div style={{
         position: 'absolute',
         bottom: '20px',
         right: '20px',
-        background: 'rgba(20,40,60,0.9)',
+        background: 'rgba(20,40,60,0.85)',
         color: '#fff',
         padding: '12px 16px',
         borderRadius: '10px',
         fontSize: '12px',
         border: '1px solid #4da6ff',
-        maxWidth: '250px'
+        maxWidth: '200px',
+        pointerEvents: 'auto'
       }}>
         <div style={{ fontWeight: 'bold', marginBottom: '5px', color: '#87ceeb' }}>
           Datos de la ISS:
         </div>
-        <div>Altitud: ~408 km</div>
-        <div>Velocidad: 28,000 km/h</div>
-        <div>Órbitas por día: ~16</div>
-        <div style={{ marginTop: '5px', opacity: 0.8 }}>
-          Operativa desde el año 2000
+        <div style={{ fontSize: '11px', lineHeight: '1.3' }}>
+          <div>Altitud: ~408 km</div>
+          <div>Velocidad: 28,000 km/h</div>
+          <div>Órbitas/día: ~16</div>
         </div>
       </div>
 
-      <style>{`
-        @keyframes slideIn {
-          0% {
-            opacity: 0;
-            transform: translateX(-50px);
-          }
-          100% {
-            opacity: 1;
-            transform: translateX(0);
-          }
-        }
-      `}</style>
+      {/* Indicador de misión en esquina inferior izquierda */}
+      <div style={{
+        position: 'absolute',
+        bottom: '20px',
+        left: '20px',
+        background: 'rgba(0,30,60,0.85)',
+        color: '#fff',
+        padding: '12px 16px',
+        borderRadius: '10px',
+        fontSize: '12px',
+        border: '1px solid #00ffff',
+        maxWidth: '280px',
+        pointerEvents: 'auto'
+      }}>
+        <div style={{ fontWeight: 'bold', marginBottom: '6px', color: '#00ffff' }}>
+          Misión: Exploración Educativa
+        </div>
+        <div style={{ fontSize: '11px', opacity: 0.9 }}>
+          Descubre la vida, trabajo e investigación en el espacio
+        </div>
+      </div>
     </div>
   )
 }
