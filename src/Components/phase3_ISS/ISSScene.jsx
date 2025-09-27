@@ -1,5 +1,5 @@
 // src/Components/phase3_ISS/ISSScene.jsx
-import React, { Suspense, useState, useEffect } from 'react'
+import React, { Suspense, useState, useEffect, useRef} from 'react'
 import { Canvas } from '@react-three/fiber'
 import { ISSEnvironment } from './ISSEnvironment'
 import { ISSPlayerControls } from './ISSPlayerControls'
@@ -8,8 +8,8 @@ import { CupolaGallery } from './CupolaGallery'
 import { IntroVideo } from './IntroVideo'
 import { ISSHUD } from './UI/ISSHUD'
 import { Player } from '../phase1_museum/Character/Player'
-
 export function ISSScene() {
+  const issModelRef = useRef()
   const [showIntroVideo, setShowIntroVideo] = useState(true)
   const [introVideoEnded, setIntroVideoEnded] = useState(false)
   const [currentVideo, setCurrentVideo] = useState(null) // Estado para video actual
@@ -256,7 +256,7 @@ export function ISSScene() {
           <pointLight position={[5, 2, 3]} intensity={0.8} color="#f0f0f0" />
           
           {/* Ambiente de la ISS - SIMPLIFICADO */}
-          <ISSEnvironment />
+          <ISSEnvironment ref={issModelRef} />
           
           {/* Estaciones de video interactivas */}
           {videoStations.map((station) => (

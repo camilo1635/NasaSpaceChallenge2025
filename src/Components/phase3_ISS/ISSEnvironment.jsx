@@ -1,14 +1,17 @@
 // src/Components/phase3_ISS/ISSEnvironment.jsx
-import React, { useRef } from 'react'
+import React, { useRef, forwardRef, useImperativeHandle } from 'react'
 import { useFrame, useLoader } from '@react-three/fiber'
 import { useGLTF } from '@react-three/drei'
 import { TextureLoader } from 'three'
 import * as THREE from 'three'
 
-export function ISSEnvironment() {
+export const ISSEnvironment = forwardRef((props, ref) => {
   const earthRef = useRef()
   const cloudsRef = useRef()
   const issModelRef = useRef()
+  
+  // Exportar la referencia de la ISS para que ISSScene pueda acceder a ella
+  useImperativeHandle(ref, () => issModelRef.current)
   
   // Cargar el modelo GLB de la ISS
   const { scene: issModel } = useGLTF('/models/iss_model.glb', true)
@@ -38,7 +41,7 @@ export function ISSEnvironment() {
     
     // Rotación sutil de la ISS para simular el movimiento orbital
     if (issModelRef.current) {
-      issModelRef.current.rotation.y += 0.001
+      issModelRef.current.rotation.y += 0.000
     }
   })
 
@@ -166,4 +169,4 @@ export function ISSEnvironment() {
       />
     </group>
   )
-}
+})

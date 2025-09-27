@@ -7,9 +7,8 @@ export function ISSPlayerControls({ children }) {
   const playerRef = useRef()
   const { camera } = useThree()
   const keys = useRef({})
-  const velocity = useRef(new THREE.Vector3(0, 0, 0))
   
-  // CAMBIO PRINCIPAL: Rotación unificada para jugador y mouse
+  // Rotación unificada para jugador y mouse
   const playerRotation = useRef({ x: 0, y: 0 })
   
   // Estados de vista
@@ -23,13 +22,112 @@ export function ISSPlayerControls({ children }) {
   const externalCameraHeight = useRef(30)
   
   // Posiciones guardadas para vista externa
-  const savedPlayerPosition = useRef(new THREE.Vector3(0, 0, 0))
+  const savedPlayerPosition = useRef(new THREE.Vector3(9.96, 0.00, 25.96))
   const savedPlayerRotation = useRef({ x: 0, y: 0 })
   
-  // Posición inicial para reset
-  const initialPosition = useRef(new THREE.Vector3(0, 0, 0))
+  // Posición fija estratégica - NUEVA POSICIÓN CENTRAL
+  const fixedPosition = useRef(new THREE.Vector3(-27, 0.00, 3))
 
-  // Manejo de teclado
+  // ======= SISTEMA SIMPLE DE MAPEO DE CILINDROS =======
+  const cylinderMapping = useRef({
+    startPoint: null,
+    endPoint: null,
+    isRecording: false
+  })
+
+  const recordCylinderPoint = () => {
+    if (!playerRef.current) return
+
+    const currentPos = playerRef.current.position.clone()
+    
+    if (!cylinderMapping.current.startPoint) {
+      // Primera presión de H: marcar punto inicial
+      cylinderMapping.current.startPoint = currentPos
+      cylinderMapping.current.isRecording = true
+      console.log('\n🟢 PUNTO INICIAL DEL CILINDRO:')
+      console.log(`   X: ${currentPos.x.toFixed(2)}`)
+      console.log(`   Y: ${currentPos.y.toFixed(2)}`)
+      console.log(`   Z: ${currentPos.z.toFixed(2)}`)
+      console.log('   Muévete al punto final y presiona H de nuevo')
+      
+    } else if (!cylinderMapping.current.endPoint) {
+      // Segunda presión de H: marcar punto final y calcular cilindro
+      cylinderMapping.current.endPoint = currentPos
+      cylinderMapping.current.isRecording = false
+      
+      console.log('\n🔴 PUNTO FINAL DEL CILINDRO:')
+      console.log(`   X: ${currentPos.x.toFixed(2)}`)
+      console.log(`   Y: ${currentPos.y.toFixed(2)}`)
+      console.log(`   Z: ${currentPos.z.toFixed(2)}`)
+      
+      // Calcular datos del cilindro
+      const start = cylinderMapping.current.startPoint
+      const end = cylinderMapping.current.endPoint
+      
+      // Centro del cilindro (punto medio)
+      const center = new THREE.Vector3(
+        (start.x + end.x) / 2,
+        (start.y + end.y) / 2,
+        (start.z + end.z) / 2
+      )
+      
+      // Vector direccional y longitud
+      const direction = end.clone().sub(start)
+      const length = direction.length()
+      
+      // Determinar eje principal
+      const absX = Math.abs(direction.x)
+      const absY = Math.abs(direction.y)
+      const absZ = Math.abs(direction.z)
+      
+      let axis, axisMin, axisMax
+      
+      if (absX > absY && absX > absZ) {
+        axis = 'x'
+        axisMin = Math.min(start.x, end.x)
+        axisMax = Math.max(start.x, end.x)
+      } else if (absZ > absY) {
+        axis = 'z'
+        axisMin = Math.min(start.z, end.z)
+        axisMax = Math.max(start.z, end.z)
+      } else {
+        axis = 'y'
+        axisMin = Math.min(start.y, end.y)
+        axisMax = Math.max(start.y, end.y)
+      }
+      
+      console.log('\n🔧 DATOS DEL CILINDRO GENERADO:')
+      console.log('=====================================')
+      console.log('{')
+      console.log(`  center: [${center.x.toFixed(2)}, ${center.y.toFixed(2)}, ${center.z.toFixed(2)}],`)
+      console.log(`  axis: '${axis}',`)
+      console.log(`  radius: 2.0, // AJUSTAR MANUALMENTE`)
+      console.log(`  ${axis}Min: ${axisMin.toFixed(2)},`)
+      console.log(`  ${axis}Max: ${axisMax.toFixed(2)}`)
+      console.log('}')
+      console.log('=====================================')
+      console.log(`Longitud del eje: ${length.toFixed(2)} unidades`)
+      console.log('Ajusta el radio según necesites y agrégalo al array modules')
+      console.log('Presiona H de nuevo para mapear otro cilindro\n')
+      
+      // Reset para el siguiente cilindro
+      cylinderMapping.current.startPoint = null
+      cylinderMapping.current.endPoint = null
+      
+    } else {
+      // Si ya hay dos puntos, empezar un nuevo cilindro
+      cylinderMapping.current.startPoint = currentPos
+      cylinderMapping.current.endPoint = null
+      cylinderMapping.current.isRecording = true
+      console.log('\n🆕 NUEVO CILINDRO - PUNTO INICIAL:')
+      console.log(`   X: ${currentPos.x.toFixed(2)}`)
+      console.log(`   Y: ${currentPos.y.toFixed(2)}`)
+      console.log(`   Z: ${currentPos.z.toFixed(2)}`)
+      console.log('   Muévete al punto final y presiona H de nuevo')
+    }
+  }
+
+  // Manejo de teclado (SIN WASD para movimiento)
   useEffect(() => {
     const down = (e) => (keys.current[e.key.toLowerCase()] = true)
     const up = (e) => (keys.current[e.key.toLowerCase()] = false)
@@ -41,7 +139,7 @@ export function ISSPlayerControls({ children }) {
     }
   }, [])
 
-  // Sistema de mouse look con pointer lock - MEJORADO
+  // Sistema de mouse look con pointer lock
   useEffect(() => {
     const handleMouseMove = (e) => {
       if (!isPointerLocked.current || externalViewActive.current) return
@@ -83,147 +181,50 @@ export function ISSPlayerControls({ children }) {
     }
   }, [])
 
-  // Sistema de colisiones para navegación interna (mantienes tu sistema actual)
-  const checkInternalCollisions = (newPosition) => {
-    const pos = newPosition.clone()
-    
-    // Límites verticales estrictos
-    pos.y = Math.max(-7.5, Math.min(7.5, pos.y))
-    
-    // Definir módulos cilíndricos de la ISS
-    const modules = [
-      {
-        // Módulo central (eje principal Z)
-        center: [0, pos.y, 0], 
-        axis: 'z', 
-        radius: 1.8,
-        zMin: -8, 
-        zMax: 8
-      },
-      {
-        // Módulo laboratorio (eje X)
-        center: [0, pos.y, -10], 
-        axis: 'x', 
-        radius: 1.6,
-        xMin: -4, 
-        xMax: 4
-      },
-      {
-        // Módulo habitación (eje X)
-        center: [0, pos.y, 10], 
-        axis: 'x', 
-        radius: 1.4,
-        xMin: -3.5, 
-        xMax: 3.5
-      }
-    ]
-
-    let isInValidSpace = false
-    let constrainedPos = pos.clone()
-
-    for (const module of modules) {
-      if (module.axis === 'z') {
-        // Módulo central - cilindro a lo largo del eje Z
-        if (pos.z >= module.zMin && pos.z <= module.zMax) {
-          const radialDistance = Math.sqrt(pos.x * pos.x + pos.y * pos.y)
-          if (radialDistance <= module.radius) {
-            isInValidSpace = true
-          } else {
-            // Empujar hacia adentro del cilindro
-            const angle = Math.atan2(pos.y, pos.x)
-            constrainedPos.x = Math.cos(angle) * module.radius
-            constrainedPos.y = Math.sin(angle) * module.radius
-            isInValidSpace = true
-          }
-        }
-      } else if (module.axis === 'x') {
-        // Módulos perpendiculares - cilindros a lo largo del eje X
-        const moduleZCenter = module.center[2]
-        if (pos.z >= moduleZCenter - 0.5 && pos.z <= moduleZCenter + 0.5) {
-          if (pos.x >= module.xMin && pos.x <= module.xMax) {
-            const radialDistance = Math.sqrt(pos.y * pos.y + (pos.z - moduleZCenter) * (pos.z - moduleZCenter))
-            if (radialDistance <= module.radius) {
-              isInValidSpace = true
-            } else {
-              const angle = Math.atan2(pos.z - moduleZCenter, pos.y)
-              constrainedPos.y = Math.cos(angle) * module.radius
-              constrainedPos.z = moduleZCenter + Math.sin(angle) * module.radius
-              isInValidSpace = true
-            }
-          }
-        }
-      }
-    }
-
-    // Verificar conexiones entre módulos (escotillas)
-    const connections = [
-      { z1: -8, z2: -6, radius: 1.7 },
-      { z1: 6, z2: 8, radius: 1.7 }
-    ]
-
-    for (const conn of connections) {
-      if (pos.z >= conn.z1 && pos.z <= conn.z2) {
-        const radialDistance = Math.sqrt(pos.x * pos.x + pos.y * pos.y)
-        if (radialDistance <= conn.radius) {
-          isInValidSpace = true
-        } else {
-          const angle = Math.atan2(pos.y, pos.x)
-          constrainedPos.x = Math.cos(angle) * conn.radius
-          constrainedPos.y = Math.sin(angle) * conn.radius
-          isInValidSpace = true
-        }
-      }
-    }
-
-    if (!isInValidSpace) {
-      return playerRef.current ? playerRef.current.position.clone() : initialPosition.current
-    }
-
-    return constrainedPos
-  }
-
-  // Controles de vista (P para externa, O para interna, V para cúpula, U para reset)
+  // Controles de vista y mapeo
   useEffect(() => {
     const handleViewControls = (e) => {
+      // NUEVO: Mapeo de cilindros con H
+      if (e.code === 'KeyH') {
+        e.preventDefault()
+        recordCylinderPoint()
+      }
+      
       // Vista externa con P
       if (e.code === 'KeyP') {
         e.preventDefault()
         
         if (!externalViewActive.current) {
-          // Activar vista externa
           externalViewActive.current = true
           cupolaViewActive.current = false
           
-          // Guardar posición y rotación actual del jugador
           if (playerRef.current) {
             savedPlayerPosition.current.copy(playerRef.current.position)
             savedPlayerRotation.current = { ...playerRotation.current }
           }
           
-          // Salir de pointer lock
           if (document.pointerLockElement) {
             document.exitPointerLock()
           }
         }
       }
       
-      // Vista interna con O
+      // Vista interna con O - REGRESA A POSICIÓN FIJA
       if (e.code === 'KeyO') {
         e.preventDefault()
         
         if (externalViewActive.current) {
-          // Volver a vista interna
           externalViewActive.current = false
           
-          // Restaurar posición y rotación del jugador
           if (playerRef.current) {
-            playerRef.current.position.copy(savedPlayerPosition.current)
-            playerRotation.current = { ...savedPlayerRotation.current }
+            // Regresar a la posición fija estratégica
+            playerRef.current.position.copy(fixedPosition.current)
+            playerRotation.current = { x: 0, y: 0 }
           }
         }
       }
       
-      // Vista rápida a cúpula con V (solo en modo interno)
+      // Vista rápida a cúpula con V
       if (e.code === 'KeyV' && !externalViewActive.current) {
         e.preventDefault()
         
@@ -231,9 +232,7 @@ export function ISSPlayerControls({ children }) {
           cupolaViewActive.current = true
           
           if (playerRef.current) {
-            // Posicionar en la cúpula
             playerRef.current.position.set(0, 8, 0)
-            velocity.current.set(0, 0, 0)
           }
           
           playerRotation.current.x = 0
@@ -241,19 +240,23 @@ export function ISSPlayerControls({ children }) {
           
         } else {
           cupolaViewActive.current = false
+          // Al salir de vista cúpula, regresar a posición fija
+          if (playerRef.current) {
+            playerRef.current.position.copy(fixedPosition.current)
+            playerRotation.current = { x: 0, y: 0 }
+          }
         }
       }
       
-      // Reset con U
+      // Reset con U - REGRESA A POSICIÓN FIJA
       if (e.code === 'KeyU') {
         e.preventDefault()
         
         if (playerRef.current) {
-          playerRef.current.position.copy(initialPosition.current)
+          playerRef.current.position.copy(fixedPosition.current)
         }
         playerRotation.current.x = 0
         playerRotation.current.y = 0
-        velocity.current.set(0, 0, 0)
         cupolaViewActive.current = false
         externalViewActive.current = false
         
@@ -271,12 +274,10 @@ export function ISSPlayerControls({ children }) {
     if (!playerRef.current) return
 
     if (externalViewActive.current) {
-      // === MODO VISTA EXTERNA === (mantiene tu código actual)
+      // === MODO VISTA EXTERNA ===
       
-      // Rotación automática de la cámara orbital
       externalCameraAngle.current += 0.005
       
-      // Controles opcionales de cámara externa (WASD para ajustar)
       const adjustSpeed = 0.02
       if (keys.current['a']) externalCameraAngle.current -= adjustSpeed
       if (keys.current['d']) externalCameraAngle.current += adjustSpeed
@@ -285,121 +286,69 @@ export function ISSPlayerControls({ children }) {
       if (keys.current['space'] || keys.current[' ']) externalCameraHeight.current += 0.3
       if (keys.current['shift']) externalCameraHeight.current -= 0.3
       
-      // Posicionar cámara orbitando alrededor de la ISS
       const targetX = Math.cos(externalCameraAngle.current) * externalCameraDistance.current
       const targetZ = Math.sin(externalCameraAngle.current) * externalCameraDistance.current
       const targetY = externalCameraHeight.current
       
       camera.position.lerp(new THREE.Vector3(targetX, targetY, targetZ), 0.1)
-      camera.lookAt(0, 0, 0) // Mirar siempre al centro de la ISS
+      camera.lookAt(0, 0, 0)
       
     } else {
-      // === MODO VISTA INTERNA - MEJORADO ===
+      // === MODO VISTA INTERNA - SINCRONIZADO CON ROTACIÓN ISS ===
       
-      // CORREGIDO: El jugador NO rota con el mouse, solo la cámara
-      // El jugador solo rota cuando se mueve con WASD
+      // MANTENER POSICIÓN FIJA RELATIVA A LA ISS
+      playerRef.current.position.copy(fixedPosition.current)
       
-      // Física de microgravedad
+      // *** ROTAR EL PERSONAJE CON LA MISMA VELOCIDAD QUE LA ISS ***
+      // Esta es la MISMA rotación que se aplica en ISSEnvironment.jsx
+      playerRef.current.rotation.y += 0.001
+
       if (!cupolaViewActive.current) {
-        const thrust = 0.016
-        const damping = 0.98
-        const maxSpeed = 0.11
-
-        // MEJORADO: Direcciones relativas a la cámara (no coordenadas absolutas)
-        // Esto hace que W siempre sea "adelante" desde la perspectiva de la cámara
+        // Vista de tercera persona: solo la cámara gira, el personaje rota con la ISS
+        const cameraDistance = 2 // Distancia de la cámara al personaje
+        const cameraHeight = 1 // Altura relativa de la cámara
         
-        // Obtener la dirección hacia donde mira la cámara (proyectada en el plano horizontal)
-        const cameraDirection = new THREE.Vector3()
-        camera.getWorldDirection(cameraDirection)
-        cameraDirection.y = 0  // Eliminar componente vertical
-        cameraDirection.normalize()
+        // Calcular posición de cámara basada SOLO en rotación del mouse
+        const cameraX = playerRef.current.position.x + Math.sin(playerRotation.current.x) * cameraDistance * Math.cos(playerRotation.current.y)
+        const cameraY = playerRef.current.position.y + cameraHeight + Math.sin(playerRotation.current.y) * cameraDistance
+        const cameraZ = playerRef.current.position.z + Math.cos(playerRotation.current.x) * cameraDistance * Math.cos(playerRotation.current.y)
         
-        // Calcular direcciones relativas a la cámara
-        const forward = cameraDirection.clone()                    // Hacia donde mira la cámara
-        const right = new THREE.Vector3().crossVectors(forward, new THREE.Vector3(0, 1, 0))  // Perpendicular a la derecha
-        const up = new THREE.Vector3(0, 1, 0)                     // Siempre hacia arriba
-
-        // Aplicar fuerzas de propulsión relativas a la vista de la cámara
-        const dir = new THREE.Vector3()
+        const targetCameraPos = new THREE.Vector3(cameraX, cameraY, cameraZ)
+        camera.position.lerp(targetCameraPos, 0.1)
         
-        if (keys.current['w']) dir.add(forward)       // Adelante (hacia donde mira la cámara)
-        if (keys.current['s']) dir.sub(forward)       // Atrás (opuesto a donde mira la cámara)
-        if (keys.current['a']) dir.sub(right)         // Izquierda (relativo a la cámara)
-        if (keys.current['d']) dir.add(right)         // Derecha (relativo a la cámara)
-        if (keys.current['space'] || keys.current[' ']) dir.add(up)  // Arriba (siempre +Y)
-        if (keys.current['shift']) dir.sub(up)        // Abajo (siempre -Y)
-
-        if (dir.lengthSq() > 0) {
-          dir.normalize().multiplyScalar(thrust)
-          velocity.current.add(dir)
-        }
-
-        if (velocity.current.length() > maxSpeed) {
-          velocity.current.normalize().multiplyScalar(maxSpeed)
-        }
-
-        velocity.current.multiplyScalar(damping)
-
-        // Aplicar movimiento con colisiones
-        const newPosition = playerRef.current.position.clone().add(velocity.current)
-        const constrainedPosition = checkInternalCollisions(newPosition)
+        // La cámara siempre mira al personaje (que rota con la ISS)
+        const playerCenter = playerRef.current.position.clone().add(new THREE.Vector3(0, 1, 0))
+        camera.lookAt(playerCenter)
         
-        if (!constrainedPosition.equals(newPosition)) {
-          velocity.current.multiplyScalar(0.2)
-        }
-        
-        playerRef.current.position.copy(constrainedPosition)
-
       } else {
-        // En vista cúpula: amortiguación gradual
-        velocity.current.multiplyScalar(0.94)
+        // Vista cúpula - movimiento temporal permitido, pero también sincronizado
+        const cameraOffset = new THREE.Vector3(0, 3, 3)
+        const rotatedOffset = cameraOffset.clone().applyAxisAngle(
+          new THREE.Vector3(0, 1, 0), 
+          playerRotation.current.x
+        )
         
-        const newPosition = playerRef.current.position.clone().add(velocity.current)
-        const constrainedPosition = checkInternalCollisions(newPosition)
-        playerRef.current.position.copy(constrainedPosition)
-      }
-
-      // MEJORADO: Cámara de tercera persona que sigue al jugador dinámicamente
-      let cameraOffset = new THREE.Vector3(0, 1, 3)  // Offset base: atrás y arriba
-      
-      if (cupolaViewActive.current) {
-        cameraOffset.set(0, 3, 3)  // Vista cúpula también alejada
-      }
-      
-      // CLAVE: Rotar el offset de la cámara según la rotación del mouse
-      // Esto hace que la cámara orbite alrededor del jugador con el mouse
-      const rotatedOffset = cameraOffset.clone().applyAxisAngle(
-        new THREE.Vector3(0, 1, 0), 
-        playerRotation.current.x  // Rotación horizontal del mouse
-      )
-      
-      // Aplicar también rotación vertical (pitch) limitada
-      const pitchMatrix = new THREE.Matrix4().makeRotationX(playerRotation.current.y * 0.5)
-      rotatedOffset.applyMatrix4(pitchMatrix)
-      
-      // Posicionar cámara relativa al jugador CON el offset rotado
-      const targetCameraPos = playerRef.current.position.clone().add(rotatedOffset)
-      camera.position.lerp(targetCameraPos, cupolaViewActive.current ? 0.12 : 0.15)
-      
-      // La cámara siempre mira hacia el jugador (no hacia donde apunta el mouse)
-      const playerHeadPosition = playerRef.current.position.clone().add(new THREE.Vector3(0, 1.5, 0))
-      camera.lookAt(playerHeadPosition)
-
-      // Flotación sutil de microgravedad (mantiene tu código actual)
-      if (velocity.current.length() > 0.006) {
-        const time = Date.now() * 0.0003
-        playerRef.current.rotation.x = Math.sin(time * 0.6) * 0.02
-        playerRef.current.rotation.z = Math.cos(time * 0.4) * 0.012
-      } else {
-        const time = Date.now() * 0.0006
-        playerRef.current.rotation.x = Math.sin(time * 0.25) * 0.008
-        playerRef.current.rotation.z = Math.cos(time * 0.15) * 0.005
+        const pitchMatrix = new THREE.Matrix4().makeRotationX(playerRotation.current.y * 0.5)
+        rotatedOffset.applyMatrix4(pitchMatrix)
+        
+        const targetCameraPos = playerRef.current.position.clone().add(rotatedOffset)
+        camera.position.lerp(targetCameraPos, 0.12)
+        
+        const playerHeadPosition = playerRef.current.position.clone().add(new THREE.Vector3(0, 1.5, 0))
+        camera.lookAt(playerHeadPosition)
       }
     }
   })
 
+  // Establecer posición inicial al montar el componente
+  useEffect(() => {
+    if (playerRef.current) {
+      playerRef.current.position.copy(fixedPosition.current)
+    }
+  }, [])
+
   return (
-    <group ref={playerRef} position={[0, 0, 0]}>
+    <group ref={playerRef} position={[9.96, 0.00, 25.96]}>
       {children}
     </group>
   )
