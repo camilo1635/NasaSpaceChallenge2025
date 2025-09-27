@@ -8,7 +8,9 @@ export function ISSPlayerControls({ children }) {
   const { camera } = useThree()
   const keys = useRef({})
   const velocity = useRef(new THREE.Vector3(0, 0, 0))
-  const mouseRotation = useRef({ x: 0, y: 0 })
+  
+  // CAMBIO PRINCIPAL: Rotación unificada para jugador y mouse
+  const playerRotation = useRef({ x: 0, y: 0 })
   
   // Estados de vista
   const externalViewActive = useRef(false)
@@ -22,7 +24,7 @@ export function ISSPlayerControls({ children }) {
   
   // Posiciones guardadas para vista externa
   const savedPlayerPosition = useRef(new THREE.Vector3(0, 0, 0))
-  const savedMouseRotation = useRef({ x: 0, y: 0 })
+  const savedPlayerRotation = useRef({ x: 0, y: 0 })
   
   // Posición inicial para reset
   const initialPosition = useRef(new THREE.Vector3(0, 0, 0))
@@ -39,17 +41,17 @@ export function ISSPlayerControls({ children }) {
     }
   }, [])
 
-  // Sistema de mouse look con pointer lock
+  // Sistema de mouse look con pointer lock - MEJORADO
   useEffect(() => {
     const handleMouseMove = (e) => {
       if (!isPointerLocked.current || externalViewActive.current) return
       
       const sensitivity = 0.002
-      mouseRotation.current.x -= e.movementX * sensitivity
-      mouseRotation.current.y -= e.movementY * sensitivity
+      playerRotation.current.x -= e.movementX * sensitivity
+      playerRotation.current.y -= e.movementY * sensitivity
       
       // Limitar rotación vertical
-      mouseRotation.current.y = Math.max(-Math.PI/2, Math.min(Math.PI/2, mouseRotation.current.y))
+      playerRotation.current.y = Math.max(-Math.PI/2, Math.min(Math.PI/2, playerRotation.current.y))
     }
 
     const handleClick = () => {
@@ -81,7 +83,7 @@ export function ISSPlayerControls({ children }) {
     }
   }, [])
 
-  // Sistema de colisiones para navegación interna
+  // Sistema de colisiones para navegación interna (mantienes tu sistema actual)
   const checkInternalCollisions = (newPosition) => {
     const pos = newPosition.clone()
     
@@ -180,7 +182,7 @@ export function ISSPlayerControls({ children }) {
     return constrainedPos
   }
 
-  // Controles de vista (P para externa, O para interna, S para cúpula, U para reset)
+  // Controles de vista (P para externa, O para interna, V para cúpula, U para reset)
   useEffect(() => {
     const handleViewControls = (e) => {
       // Vista externa con P
@@ -195,7 +197,7 @@ export function ISSPlayerControls({ children }) {
           // Guardar posición y rotación actual del jugador
           if (playerRef.current) {
             savedPlayerPosition.current.copy(playerRef.current.position)
-            savedMouseRotation.current = { ...mouseRotation.current }
+            savedPlayerRotation.current = { ...playerRotation.current }
           }
           
           // Salir de pointer lock
@@ -216,7 +218,7 @@ export function ISSPlayerControls({ children }) {
           // Restaurar posición y rotación del jugador
           if (playerRef.current) {
             playerRef.current.position.copy(savedPlayerPosition.current)
-            mouseRotation.current = { ...savedMouseRotation.current }
+            playerRotation.current = { ...savedPlayerRotation.current }
           }
         }
       }
@@ -234,8 +236,8 @@ export function ISSPlayerControls({ children }) {
             velocity.current.set(0, 0, 0)
           }
           
-          mouseRotation.current.x = 0
-          mouseRotation.current.y = Math.PI * 0.7
+          playerRotation.current.x = 0
+          playerRotation.current.y = Math.PI * 0.7
           
         } else {
           cupolaViewActive.current = false
@@ -249,8 +251,8 @@ export function ISSPlayerControls({ children }) {
         if (playerRef.current) {
           playerRef.current.position.copy(initialPosition.current)
         }
-        mouseRotation.current.x = 0
-        mouseRotation.current.y = 0
+        playerRotation.current.x = 0
+        playerRotation.current.y = 0
         velocity.current.set(0, 0, 0)
         cupolaViewActive.current = false
         externalViewActive.current = false
@@ -269,7 +271,7 @@ export function ISSPlayerControls({ children }) {
     if (!playerRef.current) return
 
     if (externalViewActive.current) {
-      // === MODO VISTA EXTERNA ===
+      // === MODO VISTA EXTERNA === (mantiene tu código actual)
       
       // Rotación automática de la cámara orbital
       externalCameraAngle.current += 0.005
@@ -292,7 +294,10 @@ export function ISSPlayerControls({ children }) {
       camera.lookAt(0, 0, 0) // Mirar siempre al centro de la ISS
       
     } else {
-      // === MODO VISTA INTERNA ===
+      // === MODO VISTA INTERNA - MEJORADO ===
+      
+      // CORREGIDO: El jugador NO rota con el mouse, solo la cámara
+      // El jugador solo rota cuando se mueve con WASD
       
       // Física de microgravedad
       if (!cupolaViewActive.current) {
@@ -300,28 +305,29 @@ export function ISSPlayerControls({ children }) {
         const damping = 0.98
         const maxSpeed = 0.11
 
-        // Direcciones basadas en la rotación del mouse
-        const forward = new THREE.Vector3(
-          Math.sin(mouseRotation.current.x),
-          0,
-          Math.cos(mouseRotation.current.x)
-        )
-        const right = new THREE.Vector3(
-          Math.cos(mouseRotation.current.x),
-          0,
-          -Math.sin(mouseRotation.current.x)
-        )
-        const up = new THREE.Vector3(0, 1, 0)
+        // MEJORADO: Direcciones relativas a la cámara (no coordenadas absolutas)
+        // Esto hace que W siempre sea "adelante" desde la perspectiva de la cámara
+        
+        // Obtener la dirección hacia donde mira la cámara (proyectada en el plano horizontal)
+        const cameraDirection = new THREE.Vector3()
+        camera.getWorldDirection(cameraDirection)
+        cameraDirection.y = 0  // Eliminar componente vertical
+        cameraDirection.normalize()
+        
+        // Calcular direcciones relativas a la cámara
+        const forward = cameraDirection.clone()                    // Hacia donde mira la cámara
+        const right = new THREE.Vector3().crossVectors(forward, new THREE.Vector3(0, 1, 0))  // Perpendicular a la derecha
+        const up = new THREE.Vector3(0, 1, 0)                     // Siempre hacia arriba
 
-        // Aplicar fuerzas de propulsión
+        // Aplicar fuerzas de propulsión relativas a la vista de la cámara
         const dir = new THREE.Vector3()
         
-        if (keys.current['w']) dir.sub(forward)
-        if (keys.current['s']) dir.add(forward)
-        if (keys.current['a']) dir.sub(right)
-        if (keys.current['d']) dir.add(right)
-        if (keys.current['space'] || keys.current[' ']) dir.add(up)
-        if (keys.current['shift']) dir.sub(up)
+        if (keys.current['w']) dir.add(forward)       // Adelante (hacia donde mira la cámara)
+        if (keys.current['s']) dir.sub(forward)       // Atrás (opuesto a donde mira la cámara)
+        if (keys.current['a']) dir.sub(right)         // Izquierda (relativo a la cámara)
+        if (keys.current['d']) dir.add(right)         // Derecha (relativo a la cámara)
+        if (keys.current['space'] || keys.current[' ']) dir.add(up)  // Arriba (siempre +Y)
+        if (keys.current['shift']) dir.sub(up)        // Abajo (siempre -Y)
 
         if (dir.lengthSq() > 0) {
           dir.normalize().multiplyScalar(thrust)
@@ -353,58 +359,33 @@ export function ISSPlayerControls({ children }) {
         playerRef.current.position.copy(constrainedPosition)
       }
 
-      // SISTEMA DE CÁMARA INTERNA CON MOUSE LOOK
-      const cameraOffset = new THREE.Vector3(0, 1.4, 3)
+      // MEJORADO: Cámara de tercera persona que sigue al jugador dinámicamente
+      let cameraOffset = new THREE.Vector3(0, 1, 3)  // Offset base: atrás y arriba
       
       if (cupolaViewActive.current) {
-        cameraOffset.set(0, 1.7, 0)
+        cameraOffset.set(0, 3, 3)  // Vista cúpula también alejada
       }
       
-      // Aplicar rotación del mouse a la cámara
-      const targetCameraPos = playerRef.current.position.clone().add(cameraOffset)
-      camera.position.lerp(targetCameraPos, cupolaViewActive.current ? 0.12 : 0.08)
-      
-      // Dirección de vista basada en mouse look
-      const lookDirection = new THREE.Vector3(
-        Math.sin(mouseRotation.current.x) * Math.cos(mouseRotation.current.y),
-        Math.sin(mouseRotation.current.y),
-        Math.cos(mouseRotation.current.x) * Math.cos(mouseRotation.current.y)
+      // CLAVE: Rotar el offset de la cámara según la rotación del mouse
+      // Esto hace que la cámara orbite alrededor del jugador con el mouse
+      const rotatedOffset = cameraOffset.clone().applyAxisAngle(
+        new THREE.Vector3(0, 1, 0), 
+        playerRotation.current.x  // Rotación horizontal del mouse
       )
       
-      const lookAtTarget = playerRef.current.position.clone().add(lookDirection.multiplyScalar(10))
-      camera.lookAt(lookAtTarget)
+      // Aplicar también rotación vertical (pitch) limitada
+      const pitchMatrix = new THREE.Matrix4().makeRotationX(playerRotation.current.y * 0.5)
+      rotatedOffset.applyMatrix4(pitchMatrix)
+      
+      // Posicionar cámara relativa al jugador CON el offset rotado
+      const targetCameraPos = playerRef.current.position.clone().add(rotatedOffset)
+      camera.position.lerp(targetCameraPos, cupolaViewActive.current ? 0.12 : 0.15)
+      
+      // La cámara siempre mira hacia el jugador (no hacia donde apunta el mouse)
+      const playerHeadPosition = playerRef.current.position.clone().add(new THREE.Vector3(0, 1.5, 0))
+      camera.lookAt(playerHeadPosition)
 
-      // Rotación del jugador basada en el movimiento
-      if (!cupolaViewActive.current) {
-        // Redefinir direcciones para esta sección
-        const forward = new THREE.Vector3(
-          Math.sin(mouseRotation.current.x),
-          0,
-          Math.cos(mouseRotation.current.x)
-        )
-        const right = new THREE.Vector3(
-          Math.cos(mouseRotation.current.x),
-          0,
-          -Math.sin(mouseRotation.current.x)
-        )
-        
-        const movementDir = new THREE.Vector3()
-        if (keys.current['w']) movementDir.sub(forward)
-        if (keys.current['s']) movementDir.add(forward)
-        if (keys.current['a']) movementDir.sub(right)
-        if (keys.current['d']) movementDir.add(right)
-        
-        if (movementDir.lengthSq() > 0) {
-          const angle = Math.atan2(movementDir.x, movementDir.z)
-          playerRef.current.rotation.y = THREE.MathUtils.lerp(
-            playerRef.current.rotation.y, 
-            angle, 
-            0.05
-          )
-        }
-      }
-
-      // Flotación sutil de microgravedad
+      // Flotación sutil de microgravedad (mantiene tu código actual)
       if (velocity.current.length() > 0.006) {
         const time = Date.now() * 0.0003
         playerRef.current.rotation.x = Math.sin(time * 0.6) * 0.02
