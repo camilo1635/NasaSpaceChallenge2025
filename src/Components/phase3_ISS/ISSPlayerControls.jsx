@@ -17,9 +17,9 @@ export function ISSPlayerControls({ children }) {
   const isPointerLocked = useRef(false)
   
   // Configuración de vista externa
-  const externalCameraDistance = useRef(25)
+  const externalCameraDistance = useRef(50)
   const externalCameraAngle = useRef(0)
-  const externalCameraHeight = useRef(10)
+  const externalCameraHeight = useRef(18)
   
   // Posición fija estratégica - NUEVA POSICIÓN CENTRAL
   const fixedPosition = useRef(new THREE.Vector3(-27, 0.00, 3))
