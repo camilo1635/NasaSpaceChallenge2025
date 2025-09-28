@@ -1,6 +1,255 @@
 // src/Components/phase1_museum/Environment/MuseumRoom.jsx
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Html } from "@react-three/drei";
+import { createPortal } from "react-dom";
+
+// Componente del modal de astronauta que se renderiza fuera del canvas 3D
+function AstronautModal({ selectedAstronaut, onClose }) {
+  useEffect(() => {
+    const handleEscape = (e) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, [onClose]);
+
+  if (!selectedAstronaut) return null;
+
+  return createPortal(
+    <div style={{
+      position: 'fixed',
+      top: '0',
+      left: '0',
+      width: '100vw',
+      height: '100vh',
+      background: 'rgba(0, 0, 0, 0.95)',
+      zIndex: 10000,
+      display: 'flex',
+      flexDirection: 'column',
+      padding: '40px',
+      boxSizing: 'border-box',
+      fontFamily: 'Arial, sans-serif'
+    }}>
+      {/* Botón cerrar */}
+      <button 
+        onClick={onClose}
+        style={{
+          position: 'absolute',
+          top: '20px',
+          right: '20px',
+          background: '#ff6b4d',
+          color: 'white',
+          border: 'none',
+          borderRadius: '50%',
+          width: '40px',
+          height: '40px',
+          fontSize: '20px',
+          cursor: 'pointer',
+          zIndex: 10001
+        }}
+      >
+        ×
+      </button>
+
+      {/* Título */}
+      <h1 style={{
+        color: '#ff6b4d',
+        textAlign: 'center',
+        fontSize: '28px',
+        marginBottom: '30px',
+        textShadow: '0 0 10px #ff6b4d'
+      }}>
+        {selectedAstronaut.name}
+      </h1>
+
+      {/* Contenido dividido */}
+      <div style={{
+        display: 'flex',
+        flex: 1,
+        gap: '40px',
+        maxWidth: '1200px',
+        margin: '0 auto',
+        width: '100%'
+      }}>
+        {/* Lado izquierdo - Imagen */}
+        <div style={{
+          flex: 1,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center'
+        }}>
+          <img 
+            src={selectedAstronaut.image}
+            alt={selectedAstronaut.name}
+            style={{
+              width: '100%',
+              maxWidth: '400px',
+              height: '300px',
+              objectFit: 'cover',
+              borderRadius: '12px',
+              border: '3px solid #ff6b4d',
+              boxShadow: '0 8px 16px rgba(255, 107, 77, 0.3)'
+            }}
+            onError={(e) => {
+              e.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjMzMzIi8+Cjx0ZXh0IHg9IjIwMCIgeT0iMTUwIiBmaWxsPSIjZmY2YjRkIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjI0Ij7wn5Gp4oCN8J+agDwvdGV4dD4KPC9zdmc+Cg==';
+            }}
+          />
+          <p style={{
+            color: '#cccccc',
+            fontSize: '14px',
+            marginTop: '15px',
+            textAlign: 'center',
+            fontStyle: 'italic'
+          }}>
+            Pionero de la exploración espacial
+          </p>
+        </div>
+
+        {/* Lado derecho - Texto informativo */}
+        <div style={{
+          flex: 1,
+          color: 'white',
+          fontSize: '16px',
+          lineHeight: '1.6'
+        }}>
+          <div style={{
+            background: 'linear-gradient(135deg, #2d1b69, #11998e)',
+            padding: '30px',
+            borderRadius: '12px',
+            border: '2px solid #ff6b4d',
+            boxShadow: '0 8px 16px rgba(0,0,0,0.4)',
+            height: '100%'
+          }}>
+            <h3 style={{
+              color: '#ff6b4d',
+              fontSize: '20px',
+              marginBottom: '20px',
+              textShadow: '0 0 5px #ff6b4d'
+            }}>
+              Biografía
+            </h3>
+            <p style={{ margin: 0 }}>
+              {selectedAstronaut.description}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>,
+    document.body
+  );
+}
+
+// Componente del panel de astronautas
+function AstronautPanel() {
+  const [selectedAstronaut, setSelectedAstronaut] = useState(null);
+
+  const astronauts = [
+    {
+      id: 1,
+      name: "Neil Armstrong",
+      icon: "👨‍🚀",
+      image: "/images/armstrong.jpg",
+      description: "Primer ser humano en caminar sobre la Luna durante la misión Apollo 11 en 1969. Comandante de la nave espacial y piloto de pruebas, Armstrong pronunció las famosas palabras 'Un pequeño paso para el hombre, un gran salto para la humanidad'."
+    },
+    {
+      id: 2,
+      name: "Valentina Tereshkova",
+      icon: "👩‍🚀",
+      image: "/images/tereshkova.jpg",
+      description: "Primera mujer en viajar al espacio en 1963 a bordo de la Vostok 6. Ingeniera y cosmonauta soviética que completó 48 órbitas terrestres en su histórica misión de tres días, abriendo el camino para las futuras mujeres astronautas."
+    },
+    {
+      id: 3,
+      name: "Yuri Gagarin",
+      icon: "🚀",
+      image: "/images/gagarin.jpg",
+      description: "Primer ser humano en viajar al espacio exterior en 1961. Su vuelo orbital de 108 minutos a bordo de la Vostok 1 marcó el inicio de la era espacial humana y demostró que los humanos podían sobrevivir en el espacio."
+    },
+    {
+      id: 4,
+      name: "Mae Jemison",
+      icon: "⭐",
+      image: "/images/jemison.jpg",
+      description: "Primera mujer afroamericana astronauta, voló al espacio en 1992 a bordo del transbordador espacial Endeavour. Médica, ingeniera y ex oficial de Peace Corps, es un símbolo de diversidad e inspiración en la exploración espacial."
+    }
+  ];
+
+  return (
+    <>
+      <div style={{
+        background: 'linear-gradient(135deg, #2d1b69, #11998e)',
+        color: 'white',
+        padding: '20px',
+        borderRadius: '12px',
+        width: '280px',
+        height: '200px',
+        fontFamily: 'Arial, sans-serif',
+        border: '3px solid #ff6b4d',
+        boxShadow: '0 8px 16px rgba(0,0,0,0.4)'
+      }}>
+        <h2 style={{ 
+          margin: '0 0 15px', 
+          fontSize: '14px', 
+          textAlign: 'center',
+          color: '#ff6b4d',
+          textShadow: '0 0 10px #ff6b4d'
+        }}>
+          👨‍🚀 Astronautas Destacados
+        </h2>
+        
+        {/* 4 iconos seleccionables */}
+        <div style={{ 
+          display: 'grid', 
+          gridTemplateColumns: 'repeat(2, 1fr)', 
+          gap: '15px',
+          marginBottom: '15px'
+        }}>
+          {astronauts.map((astronaut) => (
+            <div 
+              key={astronaut.id}
+              onClick={() => setSelectedAstronaut(astronaut)}
+              style={{
+                background: 'rgba(255, 255, 255, 0.1)',
+                border: '2px solid #ff6b4d',
+                borderRadius: '8px',
+                padding: '15px',
+                textAlign: 'center',
+                cursor: 'pointer',
+                transition: 'all 0.3s ease'
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.transform = 'scale(1.05)';
+                e.target.style.background = 'rgba(255, 107, 77, 0.2)';
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.transform = 'scale(1)';
+                e.target.style.background = 'rgba(255, 255, 255, 0.1)';
+              }}
+            >
+              <div style={{ fontSize: '24px', marginBottom: '5px' }}>
+                {astronaut.icon}
+              </div>
+              <div style={{ fontSize: '10px', color: '#cccccc' }}>
+                {astronaut.name.split(' ')[0]}
+              </div>
+            </div>
+          ))}
+        </div>
+        
+        <div style={{ fontSize: '9px', textAlign: 'center', color: '#cccccc' }}>
+          Selecciona un astronauta para conocer más
+        </div>
+      </div>
+      
+      <AstronautModal 
+        selectedAstronaut={selectedAstronaut} 
+        onClose={() => setSelectedAstronaut(null)} 
+      />
+    </>
+  );
+}
 
 export function MuseumRoom() {
   return (
@@ -165,79 +414,19 @@ export function MuseumRoom() {
       </Html>
 
       {/* Cartel 2 - Astronautas con Galería de Imágenes (Pared Derecha) */}
-      <mesh position={[3.2, 2, 0]} rotation={[0, -Math.PI/2, 0]}>
+      <mesh position={[-3.2, 2, -8]} rotation={[0, Math.PI/2, 0]}>
         <planeGeometry args={[4, 3]} />
         <meshStandardMaterial color="#f0f0f0" />
       </mesh>
       <Html 
         position={[3.15, 2, 0]} 
-        rotation={[0, -Math.PI/2, 0]} 
+        rotation={[0, Math.PI/2, 0]} 
         center
         distanceFactor={8}
         occlude
         zIndexRange={[100, 0]}
       >
-        <div style={{
-          background: 'linear-gradient(135deg, #2d1b69, #11998e)',
-          color: 'white',
-          padding: '20px',
-          borderRadius: '12px',
-          width: '280px',
-          height: '200px',
-          fontFamily: 'Arial, sans-serif',
-          border: '3px solid #ff6b4d',
-          boxShadow: '0 8px 16px rgba(0,0,0,0.4)'
-        }}>
-          <h2 style={{ 
-            margin: '0 0 10px', 
-            fontSize: '14px', 
-            textAlign: 'center',
-            color: '#ff6b4d',
-            textShadow: '0 0 10px #ff6b4d'
-          }}>
-            👨‍🚀 Astronautas Destacados
-          </h2>
-          
-          {/* Galería de imágenes de astronautas */}
-          <div style={{ 
-            display: 'grid', 
-            gridTemplateColumns: 'repeat(3, 1fr)', 
-            gap: '5px',
-            marginBottom: '10px'
-          }}>
-            {[
-              '/images/astronaut1.jpg',
-              '/images/astronaut2.jpg', 
-              '/images/astronaut3.jpg',
-              '/images/astronaut4.jpg',
-              '/images/astronaut5.jpg',
-              '/images/astronaut6.jpg'
-            ].map((src, index) => (
-              <img 
-                key={index}
-                src={src}
-                alt={`Astronauta ${index + 1}`}
-                style={{
-                  width: '60px',
-                  height: '45px',
-                  objectFit: 'cover',
-                  borderRadius: '4px',
-                  border: '1px solid #ff6b4d',
-                  transition: 'transform 0.2s'
-                }}
-                onError={(e) => {
-                  e.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNDUiIHZpZXdCb3g9IjAgMCA2MCA0NSIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjYwIiBoZWlnaHQ9IjQ1IiBmaWxsPSIjMzMzIi8+Cjx0ZXh0IHg9IjMwIiB5PSIyNSIgZmlsbD0iI2ZmZiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1zaXplPSIxMCI+8J+RqOKAjfCfmoA8L3RleHQ+Cjwvc3ZnPgo=';
-                }}
-                onMouseEnter={(e) => e.target.style.transform = 'scale(1.1)'}
-                onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}
-              />
-            ))}
-          </div>
-          
-          <div style={{ fontSize: '9px', textAlign: 'center', color: '#cccccc' }}>
-            Héroes del espacio que han vivido en la ISS
-          </div>
-        </div>
+        <AstronautPanel />
       </Html>
 
       {/* Cartel 3 - Experimentos con Audio y Video (Pared Izquierda) */}
@@ -296,74 +485,6 @@ export function MuseumRoom() {
         </div>
       </Html>
 
-      {/* Cartel 4 - Tecnología Espacial con Modelos 3D (Pared Derecha) */}
-      <mesh position={[3.2, 2, -12]} rotation={[0, -Math.PI/2, 0]}>
-        <planeGeometry args={[4, 3]} />
-        <meshStandardMaterial color="#f0f0f0" />
-      </mesh>
-      <Html 
-        position={[3.15, 2, -12]} 
-        rotation={[0, -Math.PI/2, 0]} 
-        center
-        distanceFactor={8}
-        occlude
-        zIndexRange={[100, 0]}
-      >
-        <div style={{
-          background: 'linear-gradient(135deg, #141e30, #243b55)',
-          color: 'white',
-          padding: '20px',
-          borderRadius: '12px',
-          width: '280px',
-          height: '200px',
-          fontFamily: 'Arial, sans-serif',
-          border: '3px solid #ffc107',
-          boxShadow: '0 8px 16px rgba(0,0,0,0.4)'
-        }}>
-          <h2 style={{ 
-            margin: '0 0 10px', 
-            fontSize: '14px', 
-            textAlign: 'center',
-            color: '#ffc107',
-            textShadow: '0 0 10px #ffc107'
-          }}>
-            🚀 Tecnología Espacial
-          </h2>
-          
-          {/* Imagen interactiva de la ISS */}
-          <div style={{ textAlign: 'center', marginBottom: '10px' }}>
-            <img 
-              src="/images/Anne.jpg"
-              alt="Estructura de la ISS"
-              style={{
-                width: '220px',
-                height: '120px',
-                objectFit: 'cover',
-                borderRadius: '8px',
-                border: '2px solid #ffc107',
-                cursor: 'pointer',
-                transition: 'all 0.3s ease'
-              }}
-              onError={(e) => {
-                e.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjIwIiBoZWlnaHQ9IjEyMCIgdmlld0JveD0iMCAwIDIyMCAxMjAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMjAiIGhlaWdodD0iMTIwIiBmaWxsPSIjMjIyIi8+Cjx0ZXh0IHg9IjExMCIgeT0iNjAiIGZpbGw9IiNmZmMxMDciIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMTYiPvCfmoAgSVNTIE1vZGVsIDNEPC90ZXh0Pgo8L3N2Zz4K';
-              }}
-              onMouseEnter={(e) => {
-                e.target.style.transform = 'scale(1.05)';
-                e.target.style.boxShadow = '0 0 20px #ffc107';
-              }}
-              onMouseLeave={(e) => {
-                e.target.style.transform = 'scale(1)';
-                e.target.style.boxShadow = 'none';
-              }}
-            />
-          </div>
-          
-          <div style={{ fontSize: '10px', textAlign: 'center', color: '#cccccc', lineHeight: '1.2' }}>
-            Explora los módulos y componentes de la Estación Espacial
-          </div>
-        </div>
-      </Html>
-
       {/* ===== ILUMINACIÓN AMBIENTAL MEJORADA ===== */}
       
       {/* Luces principales del techo */}
@@ -375,7 +496,6 @@ export function MuseumRoom() {
       <pointLight position={[-2, 3, -8]} intensity={1.0} color="#4da6ff" />
       <pointLight position={[2, 3, 0]} intensity={1.0} color="#ff6b4d" />
       <pointLight position={[-2, 3, 8]} intensity={1.0} color="#28a745" />
-      <pointLight position={[2, 3, -12]} intensity={1.0} color="#ffc107" />
       
       {/* Luz cerca de la puerta */}
       <pointLight position={[0, 4, -18]} intensity={0.8} color="#00ffff" />
@@ -418,7 +538,6 @@ export function MuseumRoom() {
         {pos: [-3.1, 2, -8], rot: [0, Math.PI/2, 0], color: '#4da6ff'},
         {pos: [3.1, 2, 0], rot: [0, -Math.PI/2, 0], color: '#ff6b4d'},
         {pos: [-3.1, 2, 8], rot: [0, Math.PI/2, 0], color: '#28a745'},
-        {pos: [3.1, 2, -12], rot: [0, -Math.PI/2, 0], color: '#ffc107'}
       ].map((frame, index) => (
         <mesh key={`frame-${index}`} position={frame.pos} rotation={frame.rot}>
           <ringGeometry args={[2.2, 2.3, 8]} />
