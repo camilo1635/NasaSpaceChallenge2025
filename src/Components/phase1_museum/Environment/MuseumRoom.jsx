@@ -5,11 +5,11 @@ import { Html } from "@react-three/drei";
 export function MuseumRoom() {
   return (
     <group>
-      {/* ===== LETRERO DE CONTROLES FIJO EN ESQUINA SUPERIOR DERECHA ===== */}
+      {/* ===== LETRERO DE CONTROLES FIJO EN ESQUINA SUPERIOR IZQUIERDA ===== */}
       <Html 
         transform={false}
         occlude={false}
-        calculatePosition={() => [window.innerWidth - 220, 20, 0]}
+        calculatePosition={() => [20, 20, 0]}
         style={{
           position: 'absolute',
           top: '0px',
@@ -30,7 +30,7 @@ export function MuseumRoom() {
           minWidth: '200px',
           position: 'fixed',
           top: '20px',
-          left: '-1200px'
+          left: '20px'
         }}>
           <div style={{ 
             color: '#00ffff', 
