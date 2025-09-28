@@ -48,8 +48,6 @@ function MuseumScene() {
         </PlayerControls>
       </Suspense>
 
-      {/* ===== INTERFAZ SIMPLE ===== */}
-      <SimpleHUD />
     </>
   )
 }

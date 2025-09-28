@@ -5,6 +5,57 @@ import { Html } from "@react-three/drei";
 export function MuseumRoom() {
   return (
     <group>
+      {/* ===== LETRERO DE CONTROLES FIJO EN ESQUINA SUPERIOR DERECHA ===== */}
+      <Html 
+        transform={false}
+        occlude={false}
+        calculatePosition={() => [window.innerWidth - 220, 20, 0]}
+        style={{
+          position: 'absolute',
+          top: '0px',
+          left: '0px',
+          zIndex: 9999,
+          pointerEvents: 'none'
+        }}
+      >
+        <div style={{
+          background: 'rgba(0, 0, 0, 0.85)',
+          color: '#fff',
+          padding: '12px 16px',
+          borderRadius: '8px',
+          fontFamily: 'Arial, sans-serif',
+          fontSize: '14px',
+          border: '1px solid #00ffff',
+          boxShadow: '0 4px 8px rgba(0, 255, 255, 0.3)',
+          minWidth: '200px',
+          position: 'fixed',
+          top: '20px',
+          left: '-1200px'
+        }}>
+          <div style={{ 
+            color: '#00ffff', 
+            fontWeight: 'bold', 
+            marginBottom: '8px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px'
+          }}>
+            🏛️ Museum ISS
+          </div>
+          <div style={{ lineHeight: '1.5' }}>
+            <div style={{ marginBottom: '4px' }}>
+              🎮 <strong>WASD</strong> - Move
+            </div>
+            <div style={{ marginBottom: '4px' }}>
+              🖱️ <strong>Mouse</strong> - Look around
+            </div>
+            <div>
+              👀 <strong>Observe</strong> - The information signs
+            </div>
+          </div>
+        </div>
+      </Html>
+
       {/* ===== ESTRUCTURA DEL PASILLO ===== */}
       
       {/* Piso principal */}
@@ -47,11 +98,11 @@ export function MuseumRoom() {
         <meshStandardMaterial color="#dddddd" />
       </mesh>
 
-      {/* ===== CARTELES INFORMATIVOS EN LAS PAREDES ===== */}
+      {/* ===== CARTELES MULTIMEDIA EN LAS PAREDES ===== */}
       
-      {/* Cartel 1 - Historia de la ISS (Pared Izquierda) */}
+      {/* Cartel 1 - Historia de la ISS con Video (Pared Izquierda) */}
       <mesh position={[-3.2, 2, -8]} rotation={[0, Math.PI/2, 0]}>
-        <planeGeometry args={[3, 2]} />
+        <planeGeometry args={[4, 3]} />
         <meshStandardMaterial color="#f0f0f0" />
       </mesh>
       <Html 
@@ -63,36 +114,59 @@ export function MuseumRoom() {
         zIndexRange={[100, 0]}
       >
         <div style={{
-          background: 'linear-gradient(135deg, #4da6ff, #0066cc)',
+          background: 'linear-gradient(135deg, #1a1a2e, #16213e)',
           color: 'white',
-          padding: '15px',
-          borderRadius: '8px',
-          width: '200px',
-          height: '140px',
+          padding: '20px',
+          borderRadius: '12px',
+          width: '280px',
+          height: '200px',
           fontFamily: 'Arial, sans-serif',
-          fontSize: '10px',
-          lineHeight: '1.3',
-          border: '2px solid #fff',
-          boxShadow: '0 4px 8px rgba(0,0,0,0.3)',
-          transform: 'scale(1)',
-          transformOrigin: 'center'
+          border: '3px solid #4da6ff',
+          boxShadow: '0 8px 16px rgba(0,0,0,0.4)',
+          overflow: 'hidden'
         }}>
-          <h2 style={{ margin: '0 0 8px', fontSize: '12px', textAlign: 'center' }}>
+          <h2 style={{ 
+            margin: '0 0 10px', 
+            fontSize: '14px', 
+            textAlign: 'center',
+            color: '#4da6ff',
+            textShadow: '0 0 10px #4da6ff'
+          }}>
             🛰️ Historia de la ISS
           </h2>
-          <ul style={{ margin: 0, paddingLeft: '12px', fontSize: '9px' }}>
-            <li>1998: Lanzamiento del primer módulo Zarya</li>
-            <li>2000: Primera tripulación permanente</li>
-            <li>25 años de investigación continua</li>
-            <li>Más de 260 astronautas de 19 países</li>
-            <li>Más de 3,000 experimentos realizados</li>
-          </ul>
+          
+          {/* Video de la ISS */}
+          <video 
+            src="/videos/nbl_video.mp4"
+            width="240" 
+            height="120"
+            controls
+            loop
+            muted
+            autoPlay
+            style={{
+              borderRadius: '8px',
+              border: '2px solid #4da6ff',
+              marginBottom: '8px',
+              display: 'block',
+              margin: '0 auto 8px auto'
+            }}
+            onError={() => console.log('Video no encontrado')}
+          >
+            Tu navegador no soporta video HTML5
+          </video>
+          
+          <div style={{ fontSize: '10px', textAlign: 'center', lineHeight: '1.2' }}>
+            <p style={{ margin: '2px 0', color: '#cccccc' }}>
+              25 años de investigación espacial • Más de 260 astronautas
+            </p>
+          </div>
         </div>
       </Html>
 
-      {/* Cartel 2 - Astronautas Destacados (Pared Derecha) */}
+      {/* Cartel 2 - Astronautas con Galería de Imágenes (Pared Derecha) */}
       <mesh position={[3.2, 2, 0]} rotation={[0, -Math.PI/2, 0]}>
-        <planeGeometry args={[3, 2]} />
+        <planeGeometry args={[4, 3]} />
         <meshStandardMaterial color="#f0f0f0" />
       </mesh>
       <Html 
@@ -104,36 +178,71 @@ export function MuseumRoom() {
         zIndexRange={[100, 0]}
       >
         <div style={{
-          background: 'linear-gradient(135deg, #ff6b4d, #cc3300)',
+          background: 'linear-gradient(135deg, #2d1b69, #11998e)',
           color: 'white',
-          padding: '15px',
-          borderRadius: '8px',
-          width: '200px',
-          height: '140px',
+          padding: '20px',
+          borderRadius: '12px',
+          width: '280px',
+          height: '200px',
           fontFamily: 'Arial, sans-serif',
-          fontSize: '10px',
-          lineHeight: '1.3',
-          border: '2px solid #fff',
-          boxShadow: '0 4px 8px rgba(0,0,0,0.3)',
-          transform: 'scale(1)',
-          transformOrigin: 'center'
+          border: '3px solid #ff6b4d',
+          boxShadow: '0 8px 16px rgba(0,0,0,0.4)'
         }}>
-          <h2 style={{ margin: '0 0 8px', fontSize: '12px', textAlign: 'center' }}>
+          <h2 style={{ 
+            margin: '0 0 10px', 
+            fontSize: '14px', 
+            textAlign: 'center',
+            color: '#ff6b4d',
+            textShadow: '0 0 10px #ff6b4d'
+          }}>
             👨‍🚀 Astronautas Destacados
           </h2>
-          <ul style={{ margin: 0, paddingLeft: '12px', fontSize: '9px' }}>
-            <li>William Shepherd - Primer comandante</li>
-            <li>Peggy Whitson - Récord de tiempo (665 días)</li>
-            <li>Gennady Padalka - Más de 878 días acumulados</li>
-            <li>Más de 260 caminatas espaciales</li>
-            <li>Cooperación internacional histórica</li>
-          </ul>
+          
+          {/* Galería de imágenes de astronautas */}
+          <div style={{ 
+            display: 'grid', 
+            gridTemplateColumns: 'repeat(3, 1fr)', 
+            gap: '5px',
+            marginBottom: '10px'
+          }}>
+            {[
+              '/images/astronaut1.jpg',
+              '/images/astronaut2.jpg', 
+              '/images/astronaut3.jpg',
+              '/images/astronaut4.jpg',
+              '/images/astronaut5.jpg',
+              '/images/astronaut6.jpg'
+            ].map((src, index) => (
+              <img 
+                key={index}
+                src={src}
+                alt={`Astronauta ${index + 1}`}
+                style={{
+                  width: '60px',
+                  height: '45px',
+                  objectFit: 'cover',
+                  borderRadius: '4px',
+                  border: '1px solid #ff6b4d',
+                  transition: 'transform 0.2s'
+                }}
+                onError={(e) => {
+                  e.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNDUiIHZpZXdCb3g9IjAgMCA2MCA0NSIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjYwIiBoZWlnaHQ9IjQ1IiBmaWxsPSIjMzMzIi8+Cjx0ZXh0IHg9IjMwIiB5PSIyNSIgZmlsbD0iI2ZmZiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1zaXplPSIxMCI+8J+RqOKAjfCfmoA8L3RleHQ+Cjwvc3ZnPgo=';
+                }}
+                onMouseEnter={(e) => e.target.style.transform = 'scale(1.1)'}
+                onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}
+              />
+            ))}
+          </div>
+          
+          <div style={{ fontSize: '9px', textAlign: 'center', color: '#cccccc' }}>
+            Héroes del espacio que han vivido en la ISS
+          </div>
         </div>
       </Html>
 
-      {/* Cartel 3 - Avances Tecnológicos (Pared Izquierda) */}
+      {/* Cartel 3 - Experimentos con Audio y Video (Pared Izquierda) */}
       <mesh position={[-3.2, 2, 8]} rotation={[0, Math.PI/2, 0]}>
-        <planeGeometry args={[3, 2]} />
+        <planeGeometry args={[4, 3]} />
         <meshStandardMaterial color="#f0f0f0" />
       </mesh>
       <Html 
@@ -145,49 +254,133 @@ export function MuseumRoom() {
         zIndexRange={[100, 0]}
       >
         <div style={{
-          background: 'linear-gradient(135deg, #28a745, #155724)',
+          background: 'linear-gradient(135deg, #0f3460, #16537e)',
           color: 'white',
-          padding: '15px',
-          borderRadius: '8px',
-          width: '200px',
-          height: '140px',
+          padding: '20px',
+          borderRadius: '12px',
+          width: '280px',
+          height: '200px',
           fontFamily: 'Arial, sans-serif',
-          fontSize: '10px',
-          lineHeight: '1.3',
-          border: '2px solid #fff',
-          boxShadow: '0 4px 8px rgba(0,0,0,0.3)',
-          transform: 'scale(1)',
-          transformOrigin: 'center'
+          border: '3px solid #28a745',
+          boxShadow: '0 8px 16px rgba(0,0,0,0.4)'
         }}>
-          <h2 style={{ margin: '0 0 8px', fontSize: '12px', textAlign: 'center' }}>
-            🔬 Avances Tecnológicos
+          <h2 style={{ 
+            margin: '0 0 10px', 
+            fontSize: '14px', 
+            textAlign: 'center',
+            color: '#28a745',
+            textShadow: '0 0 10px #28a745'
+          }}>
+            🔬 Experimentos en la ISS
           </h2>
-          <ul style={{ margin: 0, paddingLeft: '12px', fontSize: '9px' }}>
-            <li>Desarrollo de medicamentos en microgravedad</li>
-            <li>Investigación agrícola avanzada</li>
-            <li>Cristalización de proteínas</li>
-            <li>Tecnologías de comunicación</li>
-            <li>Beneficios directos para la Tierra</li>
-          </ul>
+          
+          {/* Video de experimentos */}
+          <video 
+            src="/videos/nbl_video.mp4"
+            width="200" 
+            height="100"
+            controls
+            loop
+            muted
+            style={{
+              borderRadius: '8px',
+              border: '2px solid #28a745',
+              marginBottom: '10px',
+              display: 'block',
+              margin: '0 auto 10px auto'
+            }}
+            onError={() => console.log('Video de experimentos no encontrado')}
+          >
+            Tu navegador no soporta video HTML5
+          </video>
         </div>
       </Html>
 
-      {/* ===== ILUMINACIÓN AMBIENTAL ===== */}
+      {/* Cartel 4 - Tecnología Espacial con Modelos 3D (Pared Derecha) */}
+      <mesh position={[3.2, 2, -12]} rotation={[0, -Math.PI/2, 0]}>
+        <planeGeometry args={[4, 3]} />
+        <meshStandardMaterial color="#f0f0f0" />
+      </mesh>
+      <Html 
+        position={[3.15, 2, -12]} 
+        rotation={[0, -Math.PI/2, 0]} 
+        center
+        distanceFactor={8}
+        occlude
+        zIndexRange={[100, 0]}
+      >
+        <div style={{
+          background: 'linear-gradient(135deg, #141e30, #243b55)',
+          color: 'white',
+          padding: '20px',
+          borderRadius: '12px',
+          width: '280px',
+          height: '200px',
+          fontFamily: 'Arial, sans-serif',
+          border: '3px solid #ffc107',
+          boxShadow: '0 8px 16px rgba(0,0,0,0.4)'
+        }}>
+          <h2 style={{ 
+            margin: '0 0 10px', 
+            fontSize: '14px', 
+            textAlign: 'center',
+            color: '#ffc107',
+            textShadow: '0 0 10px #ffc107'
+          }}>
+            🚀 Tecnología Espacial
+          </h2>
+          
+          {/* Imagen interactiva de la ISS */}
+          <div style={{ textAlign: 'center', marginBottom: '10px' }}>
+            <img 
+              src="/images/Anne.jpg"
+              alt="Estructura de la ISS"
+              style={{
+                width: '220px',
+                height: '120px',
+                objectFit: 'cover',
+                borderRadius: '8px',
+                border: '2px solid #ffc107',
+                cursor: 'pointer',
+                transition: 'all 0.3s ease'
+              }}
+              onError={(e) => {
+                e.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjIwIiBoZWlnaHQ9IjEyMCIgdmlld0JveD0iMCAwIDIyMCAxMjAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMjAiIGhlaWdodD0iMTIwIiBmaWxsPSIjMjIyIi8+Cjx0ZXh0IHg9IjExMCIgeT0iNjAiIGZpbGw9IiNmZmMxMDciIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMTYiPvCfmoAgSVNTIE1vZGVsIDNEPC90ZXh0Pgo8L3N2Zz4K';
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.transform = 'scale(1.05)';
+                e.target.style.boxShadow = '0 0 20px #ffc107';
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.transform = 'scale(1)';
+                e.target.style.boxShadow = 'none';
+              }}
+            />
+          </div>
+          
+          <div style={{ fontSize: '10px', textAlign: 'center', color: '#cccccc', lineHeight: '1.2' }}>
+            Explora los módulos y componentes de la Estación Espacial
+          </div>
+        </div>
+      </Html>
+
+      {/* ===== ILUMINACIÓN AMBIENTAL MEJORADA ===== */}
       
       {/* Luces principales del techo */}
-      <pointLight position={[0, 4, 5]} intensity={1.2} color="#ffffff" />
-      <pointLight position={[0, 4, -5]} intensity={1.2} color="#ffffff" />
-      <pointLight position={[0, 4, -15]} intensity={1.2} color="#ffffff" />
+      <pointLight position={[0, 4, 5]} intensity={1.5} color="#ffffff" />
+      <pointLight position={[0, 4, -5]} intensity={1.5} color="#ffffff" />
+      <pointLight position={[0, 4, -15]} intensity={1.5} color="#ffffff" />
       
-      {/* Luces de acento para carteles */}
-      <pointLight position={[-2, 3, -8]} intensity={0.8} color="#4da6ff" />
-      <pointLight position={[2, 3, 0]} intensity={0.8} color="#ff6b4d" />
-      <pointLight position={[-2, 3, 8]} intensity={0.8} color="#28a745" />
+      {/* Luces de acento para carteles multimedia */}
+      <pointLight position={[-2, 3, -8]} intensity={1.0} color="#4da6ff" />
+      <pointLight position={[2, 3, 0]} intensity={1.0} color="#ff6b4d" />
+      <pointLight position={[-2, 3, 8]} intensity={1.0} color="#28a745" />
+      <pointLight position={[2, 3, -12]} intensity={1.0} color="#ffc107" />
       
       {/* Luz cerca de la puerta */}
       <pointLight position={[0, 4, -18]} intensity={0.8} color="#00ffff" />
 
-      {/* ===== DECORACIÓN FUTURISTA ===== */}
+      {/* ===== DECORACIÓN FUTURISTA MEJORADA ===== */}
       
       {/* Elementos decorativos del techo */}
       {[-12, -6, 0, 6, 12].map((z, index) => (
@@ -201,21 +394,40 @@ export function MuseumRoom() {
         </mesh>
       ))}
 
-      {/* Partículas flotantes ambientales */}
-      {Array.from({length: 8}, (_, i) => (
+      {/* Partículas flotantes ambientales mejoradas */}
+      {Array.from({length: 12}, (_, i) => (
         <mesh 
           key={i}
           position={[
             (Math.random() - 0.5) * 6, 
-            1 + Math.random() * 2, 
+            1 + Math.random() * 2.5, 
             (Math.random() - 0.5) * 35
           ]}
         >
-          <sphereGeometry args={[0.02]} />
+          <sphereGeometry args={[0.03]} />
           <meshStandardMaterial 
-            color="#ffffff" 
-            emissive="#ffffff" 
-            emissiveIntensity={0.5}
+            color={['#ffffff', '#4da6ff', '#ff6b4d', '#28a745', '#ffc107'][Math.floor(Math.random() * 5)]} 
+            emissive={['#ffffff', '#4da6ff', '#ff6b4d', '#28a745', '#ffc107'][Math.floor(Math.random() * 5)]} 
+            emissiveIntensity={0.6}
+          />
+        </mesh>
+      ))}
+
+      {/* Marcos holográficos para los carteles */}
+      {[
+        {pos: [-3.1, 2, -8], rot: [0, Math.PI/2, 0], color: '#4da6ff'},
+        {pos: [3.1, 2, 0], rot: [0, -Math.PI/2, 0], color: '#ff6b4d'},
+        {pos: [-3.1, 2, 8], rot: [0, Math.PI/2, 0], color: '#28a745'},
+        {pos: [3.1, 2, -12], rot: [0, -Math.PI/2, 0], color: '#ffc107'}
+      ].map((frame, index) => (
+        <mesh key={`frame-${index}`} position={frame.pos} rotation={frame.rot}>
+          <ringGeometry args={[2.2, 2.3, 8]} />
+          <meshStandardMaterial 
+            color={frame.color} 
+            emissive={frame.color}
+            emissiveIntensity={0.2}
+            transparent
+            opacity={0.6}
           />
         </mesh>
       ))}
