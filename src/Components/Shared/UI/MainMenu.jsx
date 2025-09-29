@@ -120,9 +120,9 @@ function MainMenu() {
                 border: '1px solid rgba(77, 166, 255, 0.3)'
               }}>
                 <div style={{ fontSize: '40px', marginBottom: '10px' }}>🏛️</div>
-                <h4 style={{ color: '#4da6ff', marginBottom: '5px' }}>ISS MUSEUM</h4>
+                <h4 style={{ color: '#4da6ff', marginBottom: '5px' }}>EXHIBITION HALL</h4>
                 <p style={{ fontSize: '14px', color: '#ccc' }}>
-                  Explore 25 years of space history
+                  Multimedia hall of space exploration
                 </p>
               </div>
 
