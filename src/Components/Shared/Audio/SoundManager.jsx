@@ -5,7 +5,7 @@ import { useGameState } from '../../Utils/useGameState'
 // Single audio configuration for all phases
 const GAME_AUDIO = {
   src: '/audio/game_ambient.mp3', // Un solo archivo para todas las fases
-  volume: 0.3,
+  volume: 0.1,
   loop: true,
   name: 'Space Adventure'
 }

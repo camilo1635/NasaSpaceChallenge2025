@@ -94,7 +94,7 @@ export function ISSHUD() {
             border: '1px solid rgba(0,255,100,0.3)'
           }}>
             <div style={{ fontSize: '14px', fontWeight: 'bold', color: '#44ff88' }}>
-              🔬 <span style={{ color: '#44ff88' }}>J</span> - Scientific Experiments
+              🔬 <span style={{ color: '#44ff88' }}>J</span> - Scientific Research
             </div>
             <div style={{ fontSize: '12px', opacity: 0.8, marginTop: '2px' }}>
               Microgravity research

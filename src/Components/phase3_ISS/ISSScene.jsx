@@ -103,34 +103,29 @@ export function ISSScene() {
   // Scientific experiments list (D)
   const experiments = [
     {
-      id: 'protein_crystals',
-      title: 'Protein Crystallization',
-      image: '/images/experiments/protein_crystals.jpg',
-      description: 'In microgravity, proteins can form larger and more perfect crystals than on Earth. These crystals help scientists better understand protein structure, which is crucial for developing new medicines. Crystallization experiments on the ISS have contributed to the development of treatments for cancer, diabetes, and other diseases.'
+      id: 'Veggie PONDS',
+      image: '/images/Veggie PONDS.jpg',
+      description: 'NASA astronaut and Expedition 66 Flight Engineer Kayla Barron checks out plants growing inside the Veggie botany research facility for the Veggie PONDS experiment. The investigation tests ways to grow crops in space to supporting long-term crewed missions to the Moon, Mars and beyond.'
     },
     {
-      id: 'plant_growth',
-      title: 'Plant Growth in Microgravity',
-      image: '/images/experiments/plant_growth.jpg',
-      description: 'Astronauts grow different types of plants to understand how they grow without gravity. These experiments are fundamental for future missions to Mars, where astronauts will need to produce their own food. Plants also help purify the air and provide psychological benefits to the crew.'
+      id: 'Celestial Immunity',
+      image: '/images/Celestial Immunity.jpg',
+      description: 'NASA astronaut Mark Vande Hei works inside the Life Science Glovebox (LSG) for the Celestial Immunity study that may provide insights into new vaccines and drugs possibly advancing the commercialization of space.'
     },
     {
-      id: 'flame_studies',
-      title: 'Fire Behavior in Space',
-      image: '/images/experiments/flame_studies.jpg',
-      description: 'In microgravity, flames behave very differently than on Earth. They are more spherical and burn at lower temperatures. These studies help develop more efficient engines and cleaner combustion systems, as well as improve fire safety both in space and on Earth.'
+      id: 'DPA',
+      image: '/images/DPA.jpg',
+      description: 'A water bubble floats inside the space station as Frank Rubio observes its behavior. The space station serves as a testbed for life support equipment needed to take humans to the Moon, Mars, and beyond. One piece of this equipment, the Potable Water Dispenser (PWD), provides water for drinking and food preparation. The Exploration PWD experiment improves this system, including advanced sanitation methods and the ability to supply hot water.'
     },
     {
-      id: 'fluid_physics',
-      title: 'Fluid Physics without Gravity',
-      image: '/images/experiments/fluid_physics.jpg',
-      description: 'Fluids behave fascinatingly in microgravity, forming perfect spheres and mixing in ways impossible on Earth. These experiments help improve industrial processes, from metal casting to drug production, and teach us about fundamental physical phenomena.'
+      id: 'microgravity',
+      image: '/images/microgravity.jpg',
+      description: 'In microgravity, without the constant pull of Earth’s gravity, many changes occur in the human body. NASA understands many of the human system’s responses to the space environment, including adaptations in bone density, muscle, sensorimotor, and cardiovascular health, but much remains to be learned. These effects of spaceflight vary from one astronaut to another, so NASA flight surgeons regularly monitor the health of each crew member during a mission and tailor diet and exercise routines to prioritize health and fitness during their stay in space.'
     },
     {
-      id: 'tissue_engineering',
-      title: 'Tissue Engineering',
-      image: '/images/experiments/tissue_engineering.jpg',
-      description: 'In space, cells can grow in more natural three-dimensional structures without the influence of gravity. Scientists are developing techniques to grow human organs that could revolutionize transplants. They also study how microgravity affects cellular aging and tissue regeneration.'
+      id: 'XROOTS',
+      image: '/images/XROOTS.jpg',
+      description: 'Throughout his mission, Frank Rubio worked on XROOTS. This investigation uses hydroponic (water-based) and aeroponic (air-based) techniques instead of soil or other traditional growth media to complete the life cycle of the tomato plants shown here. The results could help identify ways to grow crops on a larger scale for future space missions.'
     }
   ]
 
@@ -602,7 +597,7 @@ export function ISSScene() {
             marginBottom: '10px',
             textAlign: 'center'
           }}>
-            🔬 ISS Scientific Experiments
+            🔬 ISS Scientific Research
           </div>
 
           <div style={{
@@ -673,7 +668,7 @@ export function ISSScene() {
             <div style={{
               width: '50%',
               height: '100%',
-              padding: '30px',
+              padding: '30px 80px 30px 30px', // Extra padding on right for arrow
               background: 'linear-gradient(135deg, #0a1a0a 0%, #1a2a1a 100%)',
               display: 'flex',
               flexDirection: 'column',
@@ -716,7 +711,8 @@ export function ISSScene() {
                 borderRadius: '50%',
                 cursor: 'pointer',
                 fontSize: '24px',
-                fontWeight: 'bold'
+                fontWeight: 'bold',
+                zIndex: 10
               }}
             >
               ←
@@ -736,7 +732,8 @@ export function ISSScene() {
                 borderRadius: '50%',
                 cursor: 'pointer',
                 fontSize: '24px',
-                fontWeight: 'bold'
+                fontWeight: 'bold',
+                zIndex: 10
               }}
             >
               →
