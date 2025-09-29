@@ -53,17 +53,6 @@ function AstronautModal({ selectedAstronaut, onClose }) {
         ×
       </button>
 
-      {/* Título */}
-      <h1 style={{
-        color: '#ff6b4d',
-        textAlign: 'center',
-        fontSize: '28px',
-        marginBottom: '30px',
-        textShadow: '0 0 10px #ff6b4d'
-      }}>
-        {selectedAstronaut.name}
-      </h1>
-
       {/* Contenido dividido */}
       <div style={{
         display: 'flex',
@@ -96,15 +85,6 @@ function AstronautModal({ selectedAstronaut, onClose }) {
               e.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjMzMzIi8+Cjx0ZXh0IHg9IjIwMCIgeT0iMTUwIiBmaWxsPSIjZmY2YjRkIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjI0Ij7wn5Gp4oCN8J+agDwvdGV4dD4KPC9zdmc+Cg==';
             }}
           />
-          <p style={{
-            color: '#cccccc',
-            fontSize: '14px',
-            marginTop: '15px',
-            textAlign: 'center',
-            fontStyle: 'italic'
-          }}>
-            Pionero de la exploración espacial
-          </p>
         </div>
 
         {/* Lado derecho - Texto informativo */}
@@ -128,7 +108,7 @@ function AstronautModal({ selectedAstronaut, onClose }) {
               marginBottom: '20px',
               textShadow: '0 0 5px #ff6b4d'
             }}>
-              Biografía
+              {selectedAstronaut.name}
             </h3>
             <p style={{ margin: 0 }}>
               {selectedAstronaut.description}
@@ -147,32 +127,32 @@ function AstronautPanel() {
 
   const astronauts = [
     {
-      id: 1,
-      name: "Neil Armstrong",
-      icon: "👨‍🚀",
-      image: "/images/armstrong.jpg",
-      description: "Primer ser humano en caminar sobre la Luna durante la misión Apollo 11 en 1969. Comandante de la nave espacial y piloto de pruebas, Armstrong pronunció las famosas palabras 'Un pequeño paso para el hombre, un gran salto para la humanidad'."
+    id: 1,
+    name: "Neil A. Armstrong",
+    icon: "👨‍🚀",
+    image: "/images/1.jpg",
+    description: "First human to walk on the Moon on July 20, 1969, as commander of Apollo 11. Naval aviator (1949–1952) and later aeronautical research scientist at NACA/NASA since 1955. Between 1960–1962, he flew the X-15 rocket plane seven times, reaching 207,500 feet and Mach 5.74 (3,989 mph). Pioneer in adaptive flight control systems and hypersonic sensor testing. Became an astronaut in 1962 and spoke the historic words upon stepping onto the lunar surface."
     },
     {
       id: 2,
-      name: "Valentina Tereshkova",
+      name: "Sally K. Ride",
       icon: "👩‍🚀",
-      image: "/images/tereshkova.jpg",
-      description: "Primera mujer en viajar al espacio en 1963 a bordo de la Vostok 6. Ingeniera y cosmonauta soviética que completó 48 órbitas terrestres en su histórica misión de tres días, abriendo el camino para las futuras mujeres astronautas."
+      image: "/images/2.jpg",
+      description: "First American woman in space, flying as Mission Specialist on STS-7 aboard Challenger in June 1983. The first Shuttle mission with a five-person crew, it deployed satellites for Canada and Indonesia, tested the Shuttle Pallet Satellite (SPAS-01) with the robotic arm, and performed the first formation flight with a free-flying satellite. The mission also carried U.S./German science payloads, operated electrophoresis and reactor experiments, and activated seven Getaway Specials. Lasted 147 hours, landing at Edwards Air Force Base."
     },
     {
       id: 3,
-      name: "Yuri Gagarin",
-      icon: "🚀",
-      image: "/images/gagarin.jpg",
-      description: "Primer ser humano en viajar al espacio exterior en 1961. Su vuelo orbital de 108 minutos a bordo de la Vostok 1 marcó el inicio de la era espacial humana y demostró que los humanos podían sobrevivir en el espacio."
+      name: "YUI Kimiya",
+      icon: "👨‍🚀",
+      image: "/images/3.jpg",
+      description: "YUI Kimiya was born in 1970 in Nagano. In 2015, he spent 142 days aboard the International Space Station as a Flight Engineer as part of the crew of Expeditions 44 and 45. During this stay, he controlled the robotics used in the capture of and conducted both Japanese and international scientific and medical experiments utilizing the space environment. In August 2025, he began his second longduration mission aboard the ISS. He is currently participating in various mission activities as a crew member of Expedition 73/74."
     },
     {
       id: 4,
-      name: "Mae Jemison",
-      icon: "⭐",
-      image: "/images/jemison.jpg",
-      description: "Primera mujer afroamericana astronauta, voló al espacio en 1992 a bordo del transbordador espacial Endeavour. Médica, ingeniera y ex oficial de Peace Corps, es un símbolo de diversidad e inspiración en la exploración espacial."
+      name: "Zena Cardman",
+      icon: "👩‍🚀",
+      image: "/images/4.jpg",
+      description: "Zena Cardman was selected as a NASA astronaut in 2017. Currently, Cardman is serving as commander for NASA's SpaceX Crew-11 mission, which launched on August 1, 2025, to the International Space Station. Upon her arrival to the space station, she became a flight engineer of Expeditions 73/74 for a long-duration science expedition aboard the orbiting laboratory."
     }
   ];
 
@@ -184,7 +164,7 @@ function AstronautPanel() {
         padding: '20px',
         borderRadius: '12px',
         width: '280px',
-        height: '200px',
+        height: '300px',
         fontFamily: 'Arial, sans-serif',
         border: '3px solid #ff6b4d',
         boxShadow: '0 8px 16px rgba(0,0,0,0.4)'
@@ -239,7 +219,7 @@ function AstronautPanel() {
         </div>
         
         <div style={{ fontSize: '9px', textAlign: 'center', color: '#cccccc' }}>
-          Selecciona un astronauta para conocer más
+          Select an astronaut to learn more
         </div>
       </div>
       

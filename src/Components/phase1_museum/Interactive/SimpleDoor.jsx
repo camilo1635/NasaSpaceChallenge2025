@@ -116,7 +116,7 @@ export function SimpleDoor({ position = [0, 0, -17] }) {
           </h2>
           
           <p style={{ margin: "8px 0", fontSize: "12px", lineHeight: "1.3" }}>
-            You have completed the showroom tour!
+            Start training at NBL to become a great astronaut
           </p>
           
           {isNearby ? (
