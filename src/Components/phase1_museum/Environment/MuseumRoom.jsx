@@ -196,7 +196,7 @@ function AstronautPanel() {
           color: '#ff6b4d',
           textShadow: '0 0 10px #ff6b4d'
         }}>
-          👨‍🚀 Astronautas Destacados
+          👨‍🚀 Featured Astronauts
         </h2>
         
         {/* 4 iconos seleccionables */}
@@ -289,7 +289,7 @@ export function MuseumRoom() {
             alignItems: 'center',
             gap: '8px'
           }}>
-            🏛️ Museum ISS
+            🏛️ Exhibition hall
           </div>
           <div style={{ lineHeight: '1.5' }}>
             <div style={{ marginBottom: '4px' }}>
@@ -381,10 +381,10 @@ export function MuseumRoom() {
             color: '#4da6ff',
             textShadow: '0 0 10px #4da6ff'
           }}>
-            🛰️ Historia de la ISS
+            Neutral Buoyancy Laboratory (NBL)
           </h2>
           
-          {/* Video de la ISS */}
+          {/* Video de NBL */}
           <video 
             src="/videos/nbl_video.mp4"
             width="240" 
@@ -404,12 +404,6 @@ export function MuseumRoom() {
           >
             Tu navegador no soporta video HTML5
           </video>
-          
-          <div style={{ fontSize: '10px', textAlign: 'center', lineHeight: '1.2' }}>
-            <p style={{ margin: '2px 0', color: '#cccccc' }}>
-              25 años de investigación espacial • Más de 260 astronautas
-            </p>
-          </div>
         </div>
       </Html>
 
@@ -451,7 +445,8 @@ export function MuseumRoom() {
           height: '200px',
           fontFamily: 'Arial, sans-serif',
           border: '3px solid #28a745',
-          boxShadow: '0 8px 16px rgba(0,0,0,0.4)'
+          boxShadow: '0 8px 16px rgba(0,0,0,0.4)',
+          overflow: 'hidden'
         }}>
           <h2 style={{ 
             margin: '0 0 10px', 
@@ -460,17 +455,18 @@ export function MuseumRoom() {
             color: '#28a745',
             textShadow: '0 0 10px #28a745'
           }}>
-            🔬 Experimentos en la ISS
+            🔬 15 Benefits of Space Station Research
           </h2>
           
           {/* Video de experimentos */}
           <video 
-            src="/videos/nbl_video.mp4"
-            width="200" 
-            height="100"
+            src="/videos/15 Benefits of Space Station Research.mp4"
+            width="240" 
+            height="120"
             controls
             loop
             muted
+            autoPlay
             style={{
               borderRadius: '8px',
               border: '2px solid #28a745',

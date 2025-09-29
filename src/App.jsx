@@ -218,7 +218,7 @@ function GameRenderer() {
         <div className="game-title">
           <h1>ISS 25th Anniversary - Space Adventure</h1>
           <div className="phase-indicator">
-            {state.currentPhase === 'museum' && 'Phase 1: ISS Museum'}
+            {state.currentPhase === 'museum' && 'Phase 1: Exhibition hall'}
             {state.currentPhase === 'nbl' && 'Phase 2: NBL Training'}
             {state.currentPhase === 'iss' && 'Phase 3: On the ISS'}
           </div>
@@ -235,10 +235,9 @@ function GameRenderer() {
       {import.meta.env.DEV && !isTransitioning && !showGlobalIntro && state.currentPhase !== 'menu' && (
         <div className="debug-info">
           <p>Phase: {state.currentPhase}</p>
-          <p>Player: {state.playerName}</p>
           {state.currentPhase === 'museum' && <p>Press 'N' to skip to NBL</p>}
           {state.currentPhase === 'nbl' && <p>Press 'I' to skip to ISS</p>}
-          <p>Dev Keys: M=Menu | 1=Museum | 2=NBL | 3=ISS</p>
+          <p>Dev Keys: M= Menu | 1= Exhibition hall | 2= NBL | 3= ISS</p>
         </div>
       )}
 

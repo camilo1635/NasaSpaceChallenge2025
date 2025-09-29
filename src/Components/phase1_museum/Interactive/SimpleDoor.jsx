@@ -112,11 +112,11 @@ export function SimpleDoor({ position = [0, 0, -17] }) {
             fontSize: "16px",
             color: "#d4edda"
           }}>
-            ENTRENAMIENTO NBL
+            NBL TRAINING
           </h2>
           
           <p style={{ margin: "8px 0", fontSize: "12px", lineHeight: "1.3" }}>
-            ¡Has completado el tour del museo!
+            You have completed the showroom tour!
           </p>
           
           {isNearby ? (
@@ -131,7 +131,7 @@ export function SimpleDoor({ position = [0, 0, -17] }) {
               boxShadow: "0 3px 6px rgba(0,0,0,0.2)",
               animation: "pulse 1.5s infinite"
             }}>
-              ⌨️ Presiona ESPACIO para continuar
+              ⌨️ Press SPACE to continue
             </div>
           ) : (
             <p style={{ 
@@ -139,7 +139,7 @@ export function SimpleDoor({ position = [0, 0, -17] }) {
               fontSize: "10px", 
               opacity: 0.8 
             }}>
-              Acércate para continuar
+              Come closer to continue
             </p>
           )}
         </div>
