@@ -31,38 +31,10 @@ export function SimpleHUD() {
         }}>
           <span style={{ fontSize: '15px', marginRight: '8px' }}>🏛️</span>
           <h3 style={{ margin: 0, fontSize: '25px', color: '#4da6ff' }}>
-            Travel ISS
+            Museum ISS
           </h3>
         </div>
 
-        {/* Instrucciones */}
-        <div style={{ marginBottom: '15px' }}>
-        <div style={{ fontSize: '20px', marginBottom: '6px' }}>
-          <span style={{ color: '#ffeb3b' }}>🎮</span> <strong>WASD</strong> - Move
-        </div>
-        <div style={{ fontSize: '20px', marginBottom: '6px' }}>
-          <span style={{ color: '#ffeb3b' }}>🖱️</span> <strong>Mouse</strong> - Look around
-        </div>
-        <div style={{ fontSize: '20px' }}>
-          <span style={{ color: '#ffeb3b' }}>👀</span> <strong>Observe</strong> - The information signs
-        </div>
-      </div>
-
-
-        
-
-        {/* Estado */}
-        <div style={{
-          marginTop: '12px',
-          padding: '8px 12px',
-          borderRadius: '8px',
-          textAlign: 'center',
-          background: 'linear-gradient(135deg, #28a745, #20c997)',
-          color: '#fff',
-          fontSize: '13px',
-          fontWeight: 'bold'
-        }}>
-        </div>
       </div>
     </Html>
   )

@@ -4,31 +4,7 @@ import { Html } from '@react-three/drei'
 
 export function InfoPanels() {
   return (
-    <group>
-      {/* Panel holográfico izquierdo */}
-      <mesh position={[-2.5, 2, -8]} rotation={[0, Math.PI/4, 0]}>
-        <planeGeometry args={[1.5, 2]} />
-        <meshStandardMaterial 
-          color="#00ffff" 
-          transparent 
-          opacity={0.3}
-          emissive="#0066ff"
-          emissiveIntensity={0.2}
-        />
-      </mesh>
-      
-      {/* Panel holográfico derecho */}
-      <mesh position={[2.5, 2, 2]} rotation={[0, -Math.PI/4, 0]}>
-        <planeGeometry args={[1.5, 2]} />
-        <meshStandardMaterial 
-          color="#ff00ff" 
-          transparent 
-          opacity={0.3}
-          emissive="#ff0066"
-          emissiveIntensity={0.2}
-        />
-      </mesh>
-      
+    <group>      
       {/* Panel central más ancho y menos alto */}
       <mesh position={[0, 3, 15]}>
         <planeGeometry args={[8, 1]} /> {/* ancho mayor, altura menor */}

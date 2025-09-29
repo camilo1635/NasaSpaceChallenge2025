@@ -1,10 +1,310 @@
 // src/Components/phase1_museum/Environment/MuseumRoom.jsx
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Html } from "@react-three/drei";
+import { createPortal } from "react-dom";
+
+// Componente del modal de astronauta que se renderiza fuera del canvas 3D
+function AstronautModal({ selectedAstronaut, onClose }) {
+  useEffect(() => {
+    const handleEscape = (e) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, [onClose]);
+
+  if (!selectedAstronaut) return null;
+
+  return createPortal(
+    <div style={{
+      position: 'fixed',
+      top: '0',
+      left: '0',
+      width: '100vw',
+      height: '100vh',
+      background: 'rgba(0, 0, 0, 0.95)',
+      zIndex: 10000,
+      display: 'flex',
+      flexDirection: 'column',
+      padding: '40px',
+      boxSizing: 'border-box',
+      fontFamily: 'Arial, sans-serif'
+    }}>
+      {/* Botón cerrar */}
+      <button 
+        onClick={onClose}
+        style={{
+          position: 'absolute',
+          top: '20px',
+          right: '20px',
+          background: '#ff6b4d',
+          color: 'white',
+          border: 'none',
+          borderRadius: '50%',
+          width: '40px',
+          height: '40px',
+          fontSize: '20px',
+          cursor: 'pointer',
+          zIndex: 10001
+        }}
+      >
+        ×
+      </button>
+
+      {/* Título */}
+      <h1 style={{
+        color: '#ff6b4d',
+        textAlign: 'center',
+        fontSize: '28px',
+        marginBottom: '30px',
+        textShadow: '0 0 10px #ff6b4d'
+      }}>
+        {selectedAstronaut.name}
+      </h1>
+
+      {/* Contenido dividido */}
+      <div style={{
+        display: 'flex',
+        flex: 1,
+        gap: '40px',
+        maxWidth: '1200px',
+        margin: '0 auto',
+        width: '100%'
+      }}>
+        {/* Lado izquierdo - Imagen */}
+        <div style={{
+          flex: 1,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center'
+        }}>
+          <img 
+            src={selectedAstronaut.image}
+            alt={selectedAstronaut.name}
+            style={{
+              width: '100%',
+              maxWidth: '400px',
+              height: '300px',
+              objectFit: 'cover',
+              borderRadius: '12px',
+              border: '3px solid #ff6b4d',
+              boxShadow: '0 8px 16px rgba(255, 107, 77, 0.3)'
+            }}
+            onError={(e) => {
+              e.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjMzMzIi8+Cjx0ZXh0IHg9IjIwMCIgeT0iMTUwIiBmaWxsPSIjZmY2YjRkIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjI0Ij7wn5Gp4oCN8J+agDwvdGV4dD4KPC9zdmc+Cg==';
+            }}
+          />
+          <p style={{
+            color: '#cccccc',
+            fontSize: '14px',
+            marginTop: '15px',
+            textAlign: 'center',
+            fontStyle: 'italic'
+          }}>
+            Pionero de la exploración espacial
+          </p>
+        </div>
+
+        {/* Lado derecho - Texto informativo */}
+        <div style={{
+          flex: 1,
+          color: 'white',
+          fontSize: '16px',
+          lineHeight: '1.6'
+        }}>
+          <div style={{
+            background: 'linear-gradient(135deg, #2d1b69, #11998e)',
+            padding: '30px',
+            borderRadius: '12px',
+            border: '2px solid #ff6b4d',
+            boxShadow: '0 8px 16px rgba(0,0,0,0.4)',
+            height: '100%'
+          }}>
+            <h3 style={{
+              color: '#ff6b4d',
+              fontSize: '20px',
+              marginBottom: '20px',
+              textShadow: '0 0 5px #ff6b4d'
+            }}>
+              Biografía
+            </h3>
+            <p style={{ margin: 0 }}>
+              {selectedAstronaut.description}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>,
+    document.body
+  );
+}
+
+// Componente del panel de astronautas
+function AstronautPanel() {
+  const [selectedAstronaut, setSelectedAstronaut] = useState(null);
+
+  const astronauts = [
+    {
+      id: 1,
+      name: "Neil Armstrong",
+      icon: "👨‍🚀",
+      image: "/images/armstrong.jpg",
+      description: "Primer ser humano en caminar sobre la Luna durante la misión Apollo 11 en 1969. Comandante de la nave espacial y piloto de pruebas, Armstrong pronunció las famosas palabras 'Un pequeño paso para el hombre, un gran salto para la humanidad'."
+    },
+    {
+      id: 2,
+      name: "Valentina Tereshkova",
+      icon: "👩‍🚀",
+      image: "/images/tereshkova.jpg",
+      description: "Primera mujer en viajar al espacio en 1963 a bordo de la Vostok 6. Ingeniera y cosmonauta soviética que completó 48 órbitas terrestres en su histórica misión de tres días, abriendo el camino para las futuras mujeres astronautas."
+    },
+    {
+      id: 3,
+      name: "Yuri Gagarin",
+      icon: "🚀",
+      image: "/images/gagarin.jpg",
+      description: "Primer ser humano en viajar al espacio exterior en 1961. Su vuelo orbital de 108 minutos a bordo de la Vostok 1 marcó el inicio de la era espacial humana y demostró que los humanos podían sobrevivir en el espacio."
+    },
+    {
+      id: 4,
+      name: "Mae Jemison",
+      icon: "⭐",
+      image: "/images/jemison.jpg",
+      description: "Primera mujer afroamericana astronauta, voló al espacio en 1992 a bordo del transbordador espacial Endeavour. Médica, ingeniera y ex oficial de Peace Corps, es un símbolo de diversidad e inspiración en la exploración espacial."
+    }
+  ];
+
+  return (
+    <>
+      <div style={{
+        background: 'linear-gradient(135deg, #2d1b69, #11998e)',
+        color: 'white',
+        padding: '20px',
+        borderRadius: '12px',
+        width: '280px',
+        height: '200px',
+        fontFamily: 'Arial, sans-serif',
+        border: '3px solid #ff6b4d',
+        boxShadow: '0 8px 16px rgba(0,0,0,0.4)'
+      }}>
+        <h2 style={{ 
+          margin: '0 0 15px', 
+          fontSize: '14px', 
+          textAlign: 'center',
+          color: '#ff6b4d',
+          textShadow: '0 0 10px #ff6b4d'
+        }}>
+          👨‍🚀 Featured Astronauts
+        </h2>
+        
+        {/* 4 iconos seleccionables */}
+        <div style={{ 
+          display: 'grid', 
+          gridTemplateColumns: 'repeat(2, 1fr)', 
+          gap: '15px',
+          marginBottom: '15px'
+        }}>
+          {astronauts.map((astronaut) => (
+            <div 
+              key={astronaut.id}
+              onClick={() => setSelectedAstronaut(astronaut)}
+              style={{
+                background: 'rgba(255, 255, 255, 0.1)',
+                border: '2px solid #ff6b4d',
+                borderRadius: '8px',
+                padding: '15px',
+                textAlign: 'center',
+                cursor: 'pointer',
+                transition: 'all 0.3s ease'
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.transform = 'scale(1.05)';
+                e.target.style.background = 'rgba(255, 107, 77, 0.2)';
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.transform = 'scale(1)';
+                e.target.style.background = 'rgba(255, 255, 255, 0.1)';
+              }}
+            >
+              <div style={{ fontSize: '24px', marginBottom: '5px' }}>
+                {astronaut.icon}
+              </div>
+              <div style={{ fontSize: '10px', color: '#cccccc' }}>
+                {astronaut.name.split(' ')[0]}
+              </div>
+            </div>
+          ))}
+        </div>
+        
+        <div style={{ fontSize: '9px', textAlign: 'center', color: '#cccccc' }}>
+          Selecciona un astronauta para conocer más
+        </div>
+      </div>
+      
+      <AstronautModal 
+        selectedAstronaut={selectedAstronaut} 
+        onClose={() => setSelectedAstronaut(null)} 
+      />
+    </>
+  );
+}
 
 export function MuseumRoom() {
   return (
     <group>
+      {/* ===== LETRERO DE CONTROLES FIJO EN ESQUINA SUPERIOR IZQUIERDA ===== */}
+      <Html 
+        transform={false}
+        occlude={false}
+        calculatePosition={() => [20, 20, 0]}
+        style={{
+          position: 'absolute',
+          top: '0px',
+          left: '0px',
+          zIndex: 9999,
+          pointerEvents: 'none'
+        }}
+      >
+        <div style={{
+          background: 'rgba(0, 0, 0, 0.85)',
+          color: '#fff',
+          padding: '12px 16px',
+          borderRadius: '8px',
+          fontFamily: 'Arial, sans-serif',
+          fontSize: '14px',
+          border: '1px solid #00ffff',
+          boxShadow: '0 4px 8px rgba(0, 255, 255, 0.3)',
+          minWidth: '200px',
+          position: 'fixed',
+          top: '20px',
+          left: '20px'
+        }}>
+          <div style={{ 
+            color: '#00ffff', 
+            fontWeight: 'bold', 
+            marginBottom: '8px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px'
+          }}>
+            🏛️ Exhibition hall
+          </div>
+          <div style={{ lineHeight: '1.5' }}>
+            <div style={{ marginBottom: '4px' }}>
+              🎮 <strong>WASD</strong> - Move
+            </div>
+            <div style={{ marginBottom: '4px' }}>
+              🖱️ <strong>Mouse</strong> - Look around
+            </div>
+            <div>
+              👀 <strong>Observe</strong> - The information signs
+            </div>
+          </div>
+        </div>
+      </Html>
+
       {/* ===== ESTRUCTURA DEL PASILLO ===== */}
       
       {/* Piso principal */}
@@ -47,11 +347,11 @@ export function MuseumRoom() {
         <meshStandardMaterial color="#dddddd" />
       </mesh>
 
-      {/* ===== CARTELES INFORMATIVOS EN LAS PAREDES ===== */}
+      {/* ===== CARTELES MULTIMEDIA EN LAS PAREDES ===== */}
       
-      {/* Cartel 1 - Historia de la ISS (Pared Izquierda) */}
+      {/* Cartel 1 - Historia de la ISS con Video (Pared Izquierda) */}
       <mesh position={[-3.2, 2, -8]} rotation={[0, Math.PI/2, 0]}>
-        <planeGeometry args={[3, 2]} />
+        <planeGeometry args={[4, 3]} />
         <meshStandardMaterial color="#f0f0f0" />
       </mesh>
       <Html 
@@ -63,77 +363,69 @@ export function MuseumRoom() {
         zIndexRange={[100, 0]}
       >
         <div style={{
-          background: 'linear-gradient(135deg, #4da6ff, #0066cc)',
+          background: 'linear-gradient(135deg, #1a1a2e, #16213e)',
           color: 'white',
-          padding: '15px',
-          borderRadius: '8px',
-          width: '200px',
-          height: '140px',
+          padding: '20px',
+          borderRadius: '12px',
+          width: '280px',
+          height: '200px',
           fontFamily: 'Arial, sans-serif',
-          fontSize: '10px',
-          lineHeight: '1.3',
-          border: '2px solid #fff',
-          boxShadow: '0 4px 8px rgba(0,0,0,0.3)',
-          transform: 'scale(1)',
-          transformOrigin: 'center'
+          border: '3px solid #4da6ff',
+          boxShadow: '0 8px 16px rgba(0,0,0,0.4)',
+          overflow: 'hidden'
         }}>
-          <h2 style={{ margin: '0 0 8px', fontSize: '12px', textAlign: 'center' }}>
-            🛰️ Historia de la ISS
+          <h2 style={{ 
+            margin: '0 0 10px', 
+            fontSize: '14px', 
+            textAlign: 'center',
+            color: '#4da6ff',
+            textShadow: '0 0 10px #4da6ff'
+          }}>
+            Neutral Buoyancy Laboratory (NBL)
           </h2>
-          <ul style={{ margin: 0, paddingLeft: '12px', fontSize: '9px' }}>
-            <li>1998: Lanzamiento del primer módulo Zarya</li>
-            <li>2000: Primera tripulación permanente</li>
-            <li>25 años de investigación continua</li>
-            <li>Más de 260 astronautas de 19 países</li>
-            <li>Más de 3,000 experimentos realizados</li>
-          </ul>
+          
+          {/* Video de NBL */}
+          <video 
+            src="/videos/nbl_video.mp4"
+            width="240" 
+            height="120"
+            controls
+            loop
+            muted
+            autoPlay
+            style={{
+              borderRadius: '8px',
+              border: '2px solid #4da6ff',
+              marginBottom: '8px',
+              display: 'block',
+              margin: '0 auto 8px auto'
+            }}
+            onError={() => console.log('Video no encontrado')}
+          >
+            Tu navegador no soporta video HTML5
+          </video>
         </div>
       </Html>
 
-      {/* Cartel 2 - Astronautas Destacados (Pared Derecha) */}
-      <mesh position={[3.2, 2, 0]} rotation={[0, -Math.PI/2, 0]}>
-        <planeGeometry args={[3, 2]} />
+      {/* Cartel 2 - Astronautas con Galería de Imágenes (Pared Derecha) */}
+      <mesh position={[-3.2, 2, -8]} rotation={[0, Math.PI/2, 0]}>
+        <planeGeometry args={[4, 3]} />
         <meshStandardMaterial color="#f0f0f0" />
       </mesh>
       <Html 
         position={[3.15, 2, 0]} 
-        rotation={[0, -Math.PI/2, 0]} 
+        rotation={[0, Math.PI/2, 0]} 
         center
         distanceFactor={8}
         occlude
         zIndexRange={[100, 0]}
       >
-        <div style={{
-          background: 'linear-gradient(135deg, #ff6b4d, #cc3300)',
-          color: 'white',
-          padding: '15px',
-          borderRadius: '8px',
-          width: '200px',
-          height: '140px',
-          fontFamily: 'Arial, sans-serif',
-          fontSize: '10px',
-          lineHeight: '1.3',
-          border: '2px solid #fff',
-          boxShadow: '0 4px 8px rgba(0,0,0,0.3)',
-          transform: 'scale(1)',
-          transformOrigin: 'center'
-        }}>
-          <h2 style={{ margin: '0 0 8px', fontSize: '12px', textAlign: 'center' }}>
-            👨‍🚀 Astronautas Destacados
-          </h2>
-          <ul style={{ margin: 0, paddingLeft: '12px', fontSize: '9px' }}>
-            <li>William Shepherd - Primer comandante</li>
-            <li>Peggy Whitson - Récord de tiempo (665 días)</li>
-            <li>Gennady Padalka - Más de 878 días acumulados</li>
-            <li>Más de 260 caminatas espaciales</li>
-            <li>Cooperación internacional histórica</li>
-          </ul>
-        </div>
+        <AstronautPanel />
       </Html>
 
-      {/* Cartel 3 - Avances Tecnológicos (Pared Izquierda) */}
+      {/* Cartel 3 - Experimentos con Audio y Video (Pared Izquierda) */}
       <mesh position={[-3.2, 2, 8]} rotation={[0, Math.PI/2, 0]}>
-        <planeGeometry args={[3, 2]} />
+        <planeGeometry args={[4, 3]} />
         <meshStandardMaterial color="#f0f0f0" />
       </mesh>
       <Html 
@@ -145,49 +437,66 @@ export function MuseumRoom() {
         zIndexRange={[100, 0]}
       >
         <div style={{
-          background: 'linear-gradient(135deg, #28a745, #155724)',
+          background: 'linear-gradient(135deg, #0f3460, #16537e)',
           color: 'white',
-          padding: '15px',
-          borderRadius: '8px',
-          width: '200px',
-          height: '140px',
+          padding: '20px',
+          borderRadius: '12px',
+          width: '280px',
+          height: '200px',
           fontFamily: 'Arial, sans-serif',
-          fontSize: '10px',
-          lineHeight: '1.3',
-          border: '2px solid #fff',
-          boxShadow: '0 4px 8px rgba(0,0,0,0.3)',
-          transform: 'scale(1)',
-          transformOrigin: 'center'
+          border: '3px solid #28a745',
+          boxShadow: '0 8px 16px rgba(0,0,0,0.4)',
+          overflow: 'hidden'
         }}>
-          <h2 style={{ margin: '0 0 8px', fontSize: '12px', textAlign: 'center' }}>
-            🔬 Avances Tecnológicos
+          <h2 style={{ 
+            margin: '0 0 10px', 
+            fontSize: '14px', 
+            textAlign: 'center',
+            color: '#28a745',
+            textShadow: '0 0 10px #28a745'
+          }}>
+            🔬 15 Benefits of Space Station Research
           </h2>
-          <ul style={{ margin: 0, paddingLeft: '12px', fontSize: '9px' }}>
-            <li>Desarrollo de medicamentos en microgravedad</li>
-            <li>Investigación agrícola avanzada</li>
-            <li>Cristalización de proteínas</li>
-            <li>Tecnologías de comunicación</li>
-            <li>Beneficios directos para la Tierra</li>
-          </ul>
+          
+          {/* Video de experimentos */}
+          <video 
+            src="/videos/15 Benefits of Space Station Research.mp4"
+            width="240" 
+            height="120"
+            controls
+            loop
+            muted
+            autoPlay
+            style={{
+              borderRadius: '8px',
+              border: '2px solid #28a745',
+              marginBottom: '10px',
+              display: 'block',
+              margin: '0 auto 10px auto'
+            }}
+            onError={() => console.log('Video de experimentos no encontrado')}
+          >
+            Tu navegador no soporta video HTML5
+          </video>
         </div>
       </Html>
 
-      {/* ===== ILUMINACIÓN AMBIENTAL ===== */}
+      {/* ===== ILUMINACIÓN AMBIENTAL MEJORADA ===== */}
       
       {/* Luces principales del techo */}
-      <pointLight position={[0, 4, 5]} intensity={1.2} color="#ffffff" />
-      <pointLight position={[0, 4, -5]} intensity={1.2} color="#ffffff" />
-      <pointLight position={[0, 4, -15]} intensity={1.2} color="#ffffff" />
+      <pointLight position={[0, 4, 5]} intensity={1.5} color="#ffffff" />
+      <pointLight position={[0, 4, -5]} intensity={1.5} color="#ffffff" />
+      <pointLight position={[0, 4, -15]} intensity={1.5} color="#ffffff" />
       
-      {/* Luces de acento para carteles */}
-      <pointLight position={[-2, 3, -8]} intensity={0.8} color="#4da6ff" />
-      <pointLight position={[2, 3, 0]} intensity={0.8} color="#ff6b4d" />
-      <pointLight position={[-2, 3, 8]} intensity={0.8} color="#28a745" />
+      {/* Luces de acento para carteles multimedia */}
+      <pointLight position={[-2, 3, -8]} intensity={1.0} color="#4da6ff" />
+      <pointLight position={[2, 3, 0]} intensity={1.0} color="#ff6b4d" />
+      <pointLight position={[-2, 3, 8]} intensity={1.0} color="#28a745" />
       
       {/* Luz cerca de la puerta */}
       <pointLight position={[0, 4, -18]} intensity={0.8} color="#00ffff" />
 
-      {/* ===== DECORACIÓN FUTURISTA ===== */}
+      {/* ===== DECORACIÓN FUTURISTA MEJORADA ===== */}
       
       {/* Elementos decorativos del techo */}
       {[-12, -6, 0, 6, 12].map((z, index) => (
@@ -201,21 +510,39 @@ export function MuseumRoom() {
         </mesh>
       ))}
 
-      {/* Partículas flotantes ambientales */}
-      {Array.from({length: 8}, (_, i) => (
+      {/* Partículas flotantes ambientales mejoradas */}
+      {Array.from({length: 12}, (_, i) => (
         <mesh 
           key={i}
           position={[
             (Math.random() - 0.5) * 6, 
-            1 + Math.random() * 2, 
+            1 + Math.random() * 2.5, 
             (Math.random() - 0.5) * 35
           ]}
         >
-          <sphereGeometry args={[0.02]} />
+          <sphereGeometry args={[0.03]} />
           <meshStandardMaterial 
-            color="#ffffff" 
-            emissive="#ffffff" 
-            emissiveIntensity={0.5}
+            color={['#ffffff', '#4da6ff', '#ff6b4d', '#28a745', '#ffc107'][Math.floor(Math.random() * 5)]} 
+            emissive={['#ffffff', '#4da6ff', '#ff6b4d', '#28a745', '#ffc107'][Math.floor(Math.random() * 5)]} 
+            emissiveIntensity={0.6}
+          />
+        </mesh>
+      ))}
+
+      {/* Marcos holográficos para los carteles */}
+      {[
+        {pos: [-3.1, 2, -8], rot: [0, Math.PI/2, 0], color: '#4da6ff'},
+        {pos: [3.1, 2, 0], rot: [0, -Math.PI/2, 0], color: '#ff6b4d'},
+        {pos: [-3.1, 2, 8], rot: [0, Math.PI/2, 0], color: '#28a745'},
+      ].map((frame, index) => (
+        <mesh key={`frame-${index}`} position={frame.pos} rotation={frame.rot}>
+          <ringGeometry args={[2.2, 2.3, 8]} />
+          <meshStandardMaterial 
+            color={frame.color} 
+            emissive={frame.color}
+            emissiveIntensity={0.2}
+            transparent
+            opacity={0.6}
           />
         </mesh>
       ))}
