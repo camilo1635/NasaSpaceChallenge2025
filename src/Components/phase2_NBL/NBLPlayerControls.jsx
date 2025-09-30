@@ -3,7 +3,7 @@ import { useRef, useEffect } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
 
-export function NBLPlayerControls({ children }) {
+export function NBLPlayerControls({ children, buoyancyData }) {
   const playerRef = useRef()
   const { camera, gl } = useThree()
   const keys = useRef({})
@@ -11,6 +11,20 @@ export function NBLPlayerControls({ children }) {
   const rotation = useRef({ x: 0, y: 0 })
   const thrusterForce = useRef(new THREE.Vector3(0, 0, 0))
   const angularVelocity = useRef({ x: 0, y: 0, z: 0 })
+
+  // Calcular flotabilidad basada en la calibración del usuario
+  const calculateBuoyancyForce = () => {
+    if (!buoyancyData) return 0
+    
+    const totalWeight = buoyancyData.userWeight + 180 + buoyancyData.addedWeights - buoyancyData.addedFloats
+    const neutralWeight = 250 // Peso objetivo para flotabilidad neutra
+    
+    // Si totalWeight > neutralWeight = se hunde (fuerza negativa hacia abajo)
+    // Si totalWeight < neutralWeight = flota (fuerza positiva hacia arriba)
+    const buoyancyForce = (neutralWeight - totalWeight) * 0.00002
+    
+    return buoyancyForce
+  }
 
   // Manejo de teclado
   useEffect(() => {
@@ -52,12 +66,12 @@ export function NBLPlayerControls({ children }) {
 
     const time = state.clock.getElapsedTime()
 
-    // Parámetros físicos del NBL (más lentos y realistas)
-    const thrusterPower = 0.002 // Potencia de los propulsores (reducida)
-    const waterResistance = 0.96 // Resistencia del agua (mayor resistencia)
-    const buoyancyForce = 0.0002 // Flotabilidad ligera (reducida)
-    const angularDamping = 0.58 // Amortiguación angular (mayor damping)
-    const maxVelocity = 0.10 // Velocidad máxima (reducida)
+    // Parámetros físicos del NBL ajustados según calibración
+    const thrusterPower = 0.002
+    const waterResistance = 0.96
+    const customBuoyancy = calculateBuoyancyForce() // Flotabilidad personalizada
+    const angularDamping = 0.58
+    const maxVelocity = 0.10
 
     // Direcciones basadas en la rotación del player
     const forward = new THREE.Vector3(
@@ -86,8 +100,8 @@ export function NBLPlayerControls({ children }) {
     // Aplicar fuerzas a la velocidad
     velocity.current.add(thrusterForce.current)
 
-    // Aplicar flotabilidad sutil
-    velocity.current.y += buoyancyForce
+    // Aplicar flotabilidad PERSONALIZADA basada en calibración
+    velocity.current.y += customBuoyancy
 
     // Aplicar resistencia del agua
     velocity.current.multiplyScalar(waterResistance)
@@ -105,7 +119,7 @@ export function NBLPlayerControls({ children }) {
     // Actualizar posición
     playerRef.current.position.add(velocity.current)
 
-    // Límites de la piscina NBL (más realistas)
+    // Límites de la piscina NBL
     const pos = playerRef.current.position
     pos.x = Math.max(-15, Math.min(15, pos.x))
     pos.y = Math.max(-9, Math.min(8, pos.y))
@@ -116,14 +130,14 @@ export function NBLPlayerControls({ children }) {
     if (pos.y <= -8.5 || pos.y >= 7.5) velocity.current.y *= -0.3
     if (pos.z <= -14.5 || pos.z >= 14.5) velocity.current.z *= -0.3
 
-    // Movimiento de flotación natural del cuerpo (más sutil)
+    // Movimiento de flotación natural del cuerpo
     const floatOffset = new THREE.Vector3(
       Math.sin(time * 0.3) * 0.008,
       Math.sin(time * 0.2) * 0.012,
       Math.cos(time * 0.25) * 0.008
     )
     
-    // Aplicar rotación flotante sutil al jugador (más lenta)
+    // Aplicar rotación flotante sutil al jugador
     playerRef.current.rotation.x = Math.sin(time * 0.15) * 0.02 + angularVelocity.current.x
     playerRef.current.rotation.z = Math.cos(time * 0.12) * 0.015 + angularVelocity.current.z
     
@@ -160,9 +174,8 @@ export function NBLPlayerControls({ children }) {
     
     camera.lookAt(lookAtTarget)
 
-    // Efectos de partículas de burbujas (simulados con rotación)
+    // Efectos de partículas de burbujas
     if (thrusterForce.current.length() > 0.01) {
-      // Agregar ligera vibración cuando se usan propulsores
       const vibration = new THREE.Vector3(
         (Math.random() - 0.5) * 0.005,
         (Math.random() - 0.5) * 0.005,

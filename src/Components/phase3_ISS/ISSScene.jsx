@@ -12,143 +12,124 @@ export function ISSScene() {
   const [showIntroVideo, setShowIntroVideo] = useState(true)
   const [introVideoEnded, setIntroVideoEnded] = useState(false)
   
-  // Estados para los 3 carruseles
-  const [showImageGallery, setShowImageGallery] = useState(false) // G - Imágenes de la cúpula
-  const [showVideoGallery, setShowVideoGallery] = useState(false) // F - Videos de vida en ISS
-  const [showExperimentGallery, setShowExperimentGallery] = useState(false) // D - Experimentos
+  // States for the 3 carousels
+  const [showImageGallery, setShowImageGallery] = useState(false) // G - Cupola images
+  const [showVideoGallery, setShowVideoGallery] = useState(false) // F - Life on ISS videos
+  const [showExperimentGallery, setShowExperimentGallery] = useState(false) // D - Experiments
   
-  // Índices actuales para cada carrusel
+  // Current indices for each carousel
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const [currentVideoIndex, setCurrentVideoIndex] = useState(0)
   const [currentExperimentIndex, setCurrentExperimentIndex] = useState(0)
 
-  // Lista de imágenes para la galería de la cúpula (G)
+  // Image list for cupola gallery (G)
   const cupolaImages = [
     {
       id: 'Hurricane_Franklin',
       src: '/images/Hurricane_Franklin.jpg',
-      title: 'Hurricane Franklin in the Atlantic Ocean',
-      description: 'Imagen capturada desde la Estación Espacial Internacional mostrando la potencia de este huracán.'
+      title: 'Hurricane Franklin in the Atlantic Ocean'
     },
     {
       id: 'Hurricane_Genevieve',
       src: '/images/Hurricane_Genevieve.jpg',
-      title: 'Hurricane Genevieve off the Pacific coast of Mexico',
-      description: 'Vista panorámica del huracán Genevieve desde la ISS sobre el Pacífico.'
+      title: 'Hurricane Genevieve off the Pacific coast of Mexico'
     },
     {
       id: 'Hurricane_Beryl',
       src: '/images/Hurricane_Beryl.jpg',
-      title: 'Hurricane Beryl pictured as a Category 5 storm',
-      description: 'Huracán Beryl en su máxima intensidad, captado desde el espacio.'
+      title: 'Hurricane Beryl pictured as a Category 5 storm'
     },
     {
       id: 'Wildfires_burn',
       src: '/images/Wildfires_burn.jpg',
-      title: 'Wildfires burn throughout Canada´s central provinces',
-      description: 'Incendios forestales masivos visibles desde la órbita en Canadá.'
+      title: 'Wildfires burn throughout Canada´s central provinces'
     },
     {
       id: 'Wildfires_breakout',
       src: '/images/Wildfires_breakout.jpg',
-      title: 'Wildfires breakout near the Greek village of Feneos',
-      description: 'Incendios forestales cerca del pueblo griego de Feneos.'
+      title: 'Wildfires breakout near the Greek village of Feneos'
     },
     {
       id: 'The_Moon',
       src: '/images/The_Moon.jpg',
-      title: 'The Moon´s shadow covers portions of Canada and the U.S.',
-      description: 'Eclipse solar visible desde la ISS cubriendo partes de Norteamérica.'
+      title: 'The Moon´s shadow covers portions of Canada and the U.S.'
     },
     {
       id: 'The_Night_New_york',
       src: '/images/The_Nigth_New_york.jpg',
-      title: 'The night lights of the New York-New Jersey metropolitan area',
-      description: 'Las luces nocturnas del área metropolitana de Nueva York-Nueva Jersey.'
+      title: 'The night lights of the New York-New Jersey metropolitan area'
     },
     {
       id: 'The_Night_Tokyo',
       src: '/images/The_Nigth_Tokyo.jpg',
-      title: 'Tokyo, Japan, the world´s most populous metropolitan area',
-      description: 'Tokio, Japón, el área metropolitana más poblada del mundo con 39.1 millones.'
+      title: 'Tokyo, Japan, the world´s most populous metropolitan area'
     },
     {
       id: 'Baghdad',
       src: '/images/Baghdad.jpg',
-      title: 'Baghdad, Iraq, split by the Tigris River',
-      description: 'Bagdad, Irak, dividida por el río Tigris con una población de 7.92 millones.'
+      title: 'Baghdad, Iraq, split by the Tigris River'
     },
     {
       id: 'Hadfield',
       src: '/images/Hadfield.jpg',
-      title: 'Hadfield uses still camera in the Cupola Module',
-      description: 'El astronauta Hadfield utiliza una cámara fija en el módulo de la cúpula.'
+      title: 'Hadfield uses still camera in the Cupola Module'
     },
     {
       id: 'Anne',
       src: '/images/Anne.jpg',
-      title: 'NASA astronaut Anne McClain poses for a portrait inside the cupola',
-      description: 'La astronauta Anne McClain posa para un retrato dentro de la cúpula.'
+      title: 'NASA astronaut Anne McClain poses for a portrait inside the cupola'
     }
   ]
 
-  // Lista de videos sobre vida en la ISS (F)
+  // Video list about life on ISS (F)
   const lifeVideos = [
     {
       id: 'coffee',
-      title: 'Cómo toman café en el espacio',
-      description: 'Descubre las técnicas especiales para beber líquidos sin gravedad y cómo los astronautas disfrutan de su café matutino.',
+      title: 'How they drink coffee in space',
       videoSrc: '/videos/coffee_space.mp4'
     },
     {
       id: 'bathroom',
-      title: 'El baño espacial',
-      description: 'Aprende cómo funciona el sistema de higiene en microgravedad y los desafíos únicos de las necesidades básicas en el espacio.',
+      title: 'The space bathroom',
       videoSrc: '/videos/space_bathroom.mp4'
     },
     {
       id: 'hair_wash',
-      title: 'Lavado de cabello femenino en el espacio',
-      description: 'Técnicas para el cuidado capilar en el espacio y cómo las astronautas mantienen su higiene personal.',
+      title: 'Female hair washing in space',
       videoSrc: '/videos/hair_wash_space.mp4'
     }
   ]
 
-  // Lista de experimentos científicos (D)
+  // Scientific experiments list (D)
   const experiments = [
     {
-      id: 'protein_crystals',
-      title: 'Cristalización de Proteínas',
-      image: '/images/experiments/protein_crystals.jpg',
-      description: 'En microgravedad, las proteínas pueden formar cristales más grandes y perfectos que en la Tierra. Estos cristales ayudan a los científicos a entender mejor la estructura de las proteínas, lo que es crucial para el desarrollo de nuevos medicamentos. Los experimentos de cristalización en la ISS han contribuido al desarrollo de tratamientos para el cáncer, la diabetes y otras enfermedades.'
+      id: 'Veggie PONDS',
+      image: '/images/Veggie PONDS.jpg',
+      description: 'NASA astronaut and Expedition 66 Flight Engineer Kayla Barron checks out plants growing inside the Veggie botany research facility for the Veggie PONDS experiment. The investigation tests ways to grow crops in space to supporting long-term crewed missions to the Moon, Mars and beyond.'
     },
     {
-      id: 'plant_growth',
-      title: 'Crecimiento de Plantas en Microgravedad',
-      image: '/images/experiments/plant_growth.jpg',
-      description: 'Los astronautas cultivan diferentes tipos de plantas para entender cómo crecen sin gravedad. Estos experimentos son fundamentales para futuras misiones a Marte, donde los astronautas necesitarán producir su propia comida. Las plantas también ayudan a purificar el aire y proporcionan beneficios psicológicos a la tripulación.'
+      id: 'Celestial Immunity',
+      image: '/images/Celestial Immunity.jpg',
+      description: 'NASA astronaut Mark Vande Hei works inside the Life Science Glovebox (LSG) for the Celestial Immunity study that may provide insights into new vaccines and drugs possibly advancing the commercialization of space.'
     },
     {
-      id: 'flame_studies',
-      title: 'Comportamiento del Fuego en el Espacio',
-      image: '/images/experiments/flame_studies.jpg',
-      description: 'En microgravedad, las llamas se comportan de manera muy diferente que en la Tierra. Son más esféricas y arden a temperaturas más bajas. Estos estudios ayudan a desarrollar motores más eficientes y sistemas de combustión más limpios, además de mejorar la seguridad contra incendios tanto en el espacio como en la Tierra.'
+      id: 'DPA',
+      image: '/images/DPA.jpg',
+      description: 'A water bubble floats inside the space station as Frank Rubio observes its behavior. The space station serves as a testbed for life support equipment needed to take humans to the Moon, Mars, and beyond. One piece of this equipment, the Potable Water Dispenser (PWD), provides water for drinking and food preparation. The Exploration PWD experiment improves this system, including advanced sanitation methods and the ability to supply hot water.'
     },
     {
-      id: 'fluid_physics',
-      title: 'Física de Fluidos sin Gravedad',
-      image: '/images/experiments/fluid_physics.jpg',
-      description: 'Los fluidos se comportan de manera fascinante en microgravedad, formando esferas perfectas y mezclándose de formas imposibles en la Tierra. Estos experimentos ayudan a mejorar procesos industriales, desde la fundición de metales hasta la producción de medicamentos, y nos enseñan sobre fenómenos físicos fundamentales.'
+      id: 'microgravity',
+      image: '/images/microgravity.jpg',
+      description: 'In microgravity, without the constant pull of Earth’s gravity, many changes occur in the human body. NASA understands many of the human system’s responses to the space environment, including adaptations in bone density, muscle, sensorimotor, and cardiovascular health, but much remains to be learned. These effects of spaceflight vary from one astronaut to another, so NASA flight surgeons regularly monitor the health of each crew member during a mission and tailor diet and exercise routines to prioritize health and fitness during their stay in space.'
     },
     {
-      id: 'tissue_engineering',
-      title: 'Ingeniería de Tejidos',
-      image: '/images/experiments/tissue_engineering.jpg',
-      description: 'En el espacio, las células pueden crecer en estructuras tridimensionales más naturales sin la influencia de la gravedad. Los científicos están desarrollando técnicos para cultivar órganos humanos que podrían revolucionar los trasplantes. También estudian cómo la microgravedad afecta el envejecimiento celular y la regeneración de tejidos.'
+      id: 'XROOTS',
+      image: '/images/XROOTS.jpg',
+      description: 'Throughout his mission, Frank Rubio worked on XROOTS. This investigation uses hydroponic (water-based) and aeroponic (air-based) techniques instead of soil or other traditional growth media to complete the life cycle of the tomato plants shown here. The results could help identify ways to grow crops on a larger scale for future space missions.'
     }
   ]
 
-  // Habilitar audio desde el primer clic
+  // Enable audio from first click
   useEffect(() => {
     const enableAudio = () => {
       if (typeof window !== 'undefined') {
@@ -171,40 +152,40 @@ export function ISSScene() {
     }
   }, [])
 
-  // Control de teclas para los 3 carruseles
+  // Key controls for the 3 carousels
   useEffect(() => {
     const handleKeyPress = (e) => {
-      // G - Galería de imágenes de la cúpula
+      // G - Cupola image gallery
       if (e.code === 'KeyG') {
         e.preventDefault()
         setShowImageGallery(true)
         setCurrentImageIndex(0)
-        // Cerrar otros carruseles
+        // Close other carousels
         setShowVideoGallery(false)
         setShowExperimentGallery(false)
       }
       
-      // F - Videos de vida en la ISS
+      // F - Life on ISS videos
       if (e.code === 'KeyF') {
         e.preventDefault()
         setShowVideoGallery(true)
         setCurrentVideoIndex(0)
-        // Cerrar otros carruseles
+        // Close other carousels
         setShowImageGallery(false)
         setShowExperimentGallery(false)
       }
       
-      // J - Experimentos científicos
+      // J - Scientific experiments
       if (e.code === 'KeyJ') {
         e.preventDefault()
         setShowExperimentGallery(true)
         setCurrentExperimentIndex(0)
-        // Cerrar otros carruseles
+        // Close other carousels
         setShowImageGallery(false)
         setShowVideoGallery(false)
       }
       
-      // ESC - Cerrar cualquier carrusel abierto
+      // ESC - Close any open carousel
       if (e.code === 'Escape') {
         setShowImageGallery(false)
         setShowVideoGallery(false)
@@ -216,7 +197,7 @@ export function ISSScene() {
     return () => window.removeEventListener('keydown', handleKeyPress)
   }, [])
 
-  // Navegación con flechas para todos los carruseles
+  // Arrow navigation for all carousels
   useEffect(() => {
     const handleArrowKeys = (e) => {
       if (!showImageGallery && !showVideoGallery && !showExperimentGallery) return
@@ -257,7 +238,7 @@ export function ISSScene() {
     }, 1000)
   }
 
-  // Funciones de navegación
+  // Navigation functions
   const navigateCarousel = (direction, carouselType) => {
     if (carouselType === 'images') {
       setCurrentImageIndex(prev => {
@@ -286,7 +267,7 @@ export function ISSScene() {
     }
   }
 
-  // Si el video intro no ha terminado, mostrarlo
+  // If intro video hasn't ended, show it
   if (showIntroVideo) {
     return (
       <IntroVideo 
@@ -296,7 +277,7 @@ export function ISSScene() {
     )
   }
 
-  // Renderizar la ISS
+  // Render the ISS
   return (
     <div style={{ width: '100%', height: '100vh', position: 'relative' }}>
       <Canvas 
@@ -326,10 +307,10 @@ export function ISSScene() {
         </Suspense>
       </Canvas>
       
-      {/* HUD siempre visible FUERA del Canvas */}
+      {/* HUD always visible OUTSIDE the Canvas */}
       <ISSHUD />
 
-      {/* GALERÍA DE IMÁGENES DE LA CÚPULA (G) */}
+      {/* CUPOLA IMAGE GALLERY (G) */}
       {showImageGallery && (
         <div style={{
           position: 'fixed',
@@ -351,7 +332,7 @@ export function ISSScene() {
             marginBottom: '10px',
             textAlign: 'center'
           }}>
-            🖼️ Galería de la Cúpula ISS
+            🖼️ ISS Cupola Gallery
           </div>
 
           <div style={{
@@ -359,7 +340,7 @@ export function ISSScene() {
             fontSize: '16px',
             marginBottom: '20px'
           }}>
-            Imagen {currentImageIndex + 1} de {cupolaImages.length}
+            Image {currentImageIndex + 1} of {cupolaImages.length}
           </div>
 
           <div style={{
@@ -449,34 +430,18 @@ export function ISSScene() {
             gap: '15px',
             alignItems: 'center'
           }}>
-            <button
-              onClick={() => setShowImageGallery(false)}
-              style={{
-                background: '#ff4444',
-                border: 'none',
-                color: '#fff',
-                padding: '12px 20px',
-                borderRadius: '8px',
-                cursor: 'pointer',
-                fontSize: '14px',
-                fontWeight: 'bold'
-              }}
-            >
-              Cerrar Galería
-            </button>
-            
-            <div style={{
+              <div style={{
               color: '#ffffff',
               fontSize: '12px',
               opacity: 0.7
             }}>
-              ESC: Cerrar | ← →: Navegar | A D: Navegar
+              ESC: Close
             </div>
           </div>
         </div>
       )}
 
-      {/* GALERÍA DE VIDEOS - VIDA EN LA ISS (F) */}
+      {/* VIDEO GALLERY - LIFE ON ISS (F) */}
       {showVideoGallery && (
         <div style={{
           position: 'fixed',
@@ -498,7 +463,7 @@ export function ISSScene() {
             marginBottom: '10px',
             textAlign: 'center'
           }}>
-            🎬 Vida en la ISS
+            🎬 Life on ISS
           </div>
 
           <div style={{
@@ -506,7 +471,7 @@ export function ISSScene() {
             fontSize: '16px',
             marginBottom: '20px'
           }}>
-            Video {currentVideoIndex + 1} de {lifeVideos.length}
+            Video {currentVideoIndex + 1} of {lifeVideos.length}
           </div>
 
           <div style={{
@@ -522,7 +487,7 @@ export function ISSScene() {
             background: '#111111'
           }}>
             <video
-              key={`video-${currentVideoIndex}`} // Clave única para forzar recreación
+              key={`video-${currentVideoIndex}`} // Unique key to force recreation
               controls
               autoPlay
               style={{
@@ -532,7 +497,7 @@ export function ISSScene() {
               }}
             >
               <source src={lifeVideos[currentVideoIndex].videoSrc} type="video/mp4" />
-              Tu navegador no soporta el elemento video.
+              Your browser does not support the video element.
             </video>
 
             <button
@@ -598,35 +563,19 @@ export function ISSScene() {
             display: 'flex',
             gap: '15px',
             alignItems: 'center'
-          }}>
-            <button
-              onClick={() => setShowVideoGallery(false)}
-              style={{
-                background: '#ff4444',
-                border: 'none',
-                color: '#fff',
-                padding: '12px 20px',
-                borderRadius: '8px',
-                cursor: 'pointer',
-                fontSize: '14px',
-                fontWeight: 'bold'
-              }}
-            >
-              Cerrar Videos
-            </button>
-            
+          }}>            
             <div style={{
               color: '#ffffff',
               fontSize: '12px',
               opacity: 0.7
             }}>
-              ESC: Cerrar | ← →: Navegar | A D: Navegar
+              ESC: Close
             </div>
           </div>
         </div>
       )}
 
-      {/* GALERÍA DE EXPERIMENTOS CIENTÍFICOS (D) */}
+      {/* SCIENTIFIC EXPERIMENTS GALLERY (D) */}
       {showExperimentGallery && (
         <div style={{
           position: 'fixed',
@@ -648,7 +597,7 @@ export function ISSScene() {
             marginBottom: '10px',
             textAlign: 'center'
           }}>
-            🔬 Experimentos Científicos ISS
+            🔬 ISS Scientific Research
           </div>
 
           <div style={{
@@ -656,10 +605,10 @@ export function ISSScene() {
             fontSize: '16px',
             marginBottom: '20px'
           }}>
-            Experimento {currentExperimentIndex + 1} de {experiments.length}
+            Experiment {currentExperimentIndex + 1} of {experiments.length}
           </div>
 
-          {/* Contenedor dividido verticalmente */}
+          {/* Container divided vertically */}
           <div style={{
             position: 'relative',
             width: '95vw',
@@ -670,7 +619,7 @@ export function ISSScene() {
             overflow: 'hidden',
             background: '#111111'
           }}>
-            {/* Lado izquierdo - Imagen */}
+            {/* Left side - Image */}
             <div style={{
               width: '50%',
               height: '100%',
@@ -695,7 +644,7 @@ export function ISSScene() {
                 }}
               />
               
-              {/* Placeholder si la imagen no carga */}
+              {/* Placeholder if image doesn't load */}
               <div style={{
                 display: 'none',
                 width: '100%',
@@ -708,18 +657,18 @@ export function ISSScene() {
                 fontSize: '18px'
               }}>
                 <div style={{ fontSize: '48px', marginBottom: '20px' }}>🔬</div>
-                <div>Imagen del experimento</div>
+                <div>Experiment image</div>
                 <div style={{ fontSize: '14px', marginTop: '10px', opacity: 0.7 }}>
                   {experiments[currentExperimentIndex].title}
                 </div>
               </div>
             </div>
 
-            {/* Lado derecho - Texto */}
+            {/* Right side - Text */}
             <div style={{
               width: '50%',
               height: '100%',
-              padding: '30px',
+              padding: '30px 80px 30px 30px', // Extra padding on right for arrow
               background: 'linear-gradient(135deg, #0a1a0a 0%, #1a2a1a 100%)',
               display: 'flex',
               flexDirection: 'column',
@@ -747,7 +696,7 @@ export function ISSScene() {
               </p>
             </div>
 
-            {/* Botones de navegación */}
+            {/* Navigation buttons */}
             <button
               onClick={() => navigateCarousel('prev', 'experiments')}
               style={{
@@ -762,7 +711,8 @@ export function ISSScene() {
                 borderRadius: '50%',
                 cursor: 'pointer',
                 fontSize: '24px',
-                fontWeight: 'bold'
+                fontWeight: 'bold',
+                zIndex: 10
               }}
             >
               ←
@@ -782,7 +732,8 @@ export function ISSScene() {
                 borderRadius: '50%',
                 cursor: 'pointer',
                 fontSize: '24px',
-                fontWeight: 'bold'
+                fontWeight: 'bold',
+                zIndex: 10
               }}
             >
               →
@@ -794,29 +745,13 @@ export function ISSScene() {
             display: 'flex',
             gap: '15px',
             alignItems: 'center'
-          }}>
-            <button
-              onClick={() => setShowExperimentGallery(false)}
-              style={{
-                background: '#ff4444',
-                border: 'none',
-                color: '#fff',
-                padding: '12px 20px',
-                borderRadius: '8px',
-                cursor: 'pointer',
-                fontSize: '14px',
-                fontWeight: 'bold'
-              }}
-            >
-              Cerrar Experimentos
-            </button>
-            
+          }}>           
             <div style={{
               color: '#ffffff',
               fontSize: '12px',
               opacity: 0.7
             }}>
-              ESC: Cerrar | ← →: Navegar | A D: Navegar
+              ESC: Close
             </div>
           </div>
         </div>
