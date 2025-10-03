@@ -53,33 +53,35 @@ function AstronautModal({ selectedAstronaut, onClose }) {
         ×
       </button>
 
-      {/* Contenido dividido */}
+{/* Contenido dividido */}
       <div style={{
         display: 'flex',
         flex: 1,
-        gap: '40px',
-        maxWidth: '1200px',
+        gap: '50px',
+        maxWidth: '1400px',
         margin: '0 auto',
-        width: '100%'
+        width: '100%',
+        alignItems: 'center'
       }}>
-        {/* Lado izquierdo - Imagen */}
+        {/* Lado izquierdo - Imagen más grande y centrada */}
         <div style={{
           flex: 1,
           display: 'flex',
           flexDirection: 'column',
-          alignItems: 'center'
+          alignItems: 'center',
+          justifyContent: 'center'
         }}>
           <img 
             src={selectedAstronaut.image}
             alt={selectedAstronaut.name}
             style={{
               width: '100%',
-              maxWidth: '400px',
-              height: '300px',
+              maxWidth: '550px',
+              height: '450px',
               objectFit: 'cover',
-              borderRadius: '12px',
-              border: '3px solid #ff6b4d',
-              boxShadow: '0 8px 16px rgba(255, 107, 77, 0.3)'
+              borderRadius: '16px',
+              border: '4px solid #ff6b4d',
+              boxShadow: '0 12px 24px rgba(255, 107, 77, 0.4)'
             }}
             onError={(e) => {
               e.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjMzMzIi8+Cjx0ZXh0IHg9IjIwMCIgeT0iMTUwIiBmaWxsPSIjZmY2YjRkIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjI0Ij7wn5Gp4oCN8J+agDwvdGV4dD4KPC9zdmc+Cg==';
@@ -87,30 +89,38 @@ function AstronautModal({ selectedAstronaut, onClose }) {
           />
         </div>
 
-        {/* Lado derecho - Texto informativo */}
+        {/* Lado derecho - Texto informativo centrado */}
         <div style={{
           flex: 1,
           color: 'white',
-          fontSize: '16px',
-          lineHeight: '1.6'
+          fontSize: '17px',
+          lineHeight: '1.8',
+          display: 'flex',
+          alignItems: 'center'
         }}>
           <div style={{
             background: 'linear-gradient(135deg, #2d1b69, #11998e)',
-            padding: '30px',
-            borderRadius: '12px',
-            border: '2px solid #ff6b4d',
-            boxShadow: '0 8px 16px rgba(0,0,0,0.4)',
-            height: '100%'
+            padding: '40px',
+            borderRadius: '16px',
+            border: '3px solid #ff6b4d',
+            boxShadow: '0 12px 24px rgba(0,0,0,0.5)',
+            width: '100%',
+            maxHeight: '450px',
+            overflowY: 'auto'
           }}>
             <h3 style={{
               color: '#ff6b4d',
-              fontSize: '20px',
-              marginBottom: '20px',
-              textShadow: '0 0 5px #ff6b4d'
+              fontSize: '28px',
+              marginBottom: '25px',
+              textShadow: '0 0 8px #ff6b4d',
+              textAlign: 'center'
             }}>
               {selectedAstronaut.name}
             </h3>
-            <p style={{ margin: 0 }}>
+            <p style={{ 
+              margin: 0,
+              textAlign: 'justify'
+            }}>
               {selectedAstronaut.description}
             </p>
           </div>
