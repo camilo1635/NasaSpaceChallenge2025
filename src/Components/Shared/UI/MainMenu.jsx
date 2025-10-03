@@ -154,7 +154,7 @@ function MainMenu() {
                 <div style={{ fontSize: '40px', marginBottom: '10px' }}>🚀</div>
                 <h4 style={{ color: '#4da6ff', marginBottom: '5px' }}>LIFE ON ISS</h4>
                 <p style={{ fontSize: '14px', color: '#ccc' }}>
-                  Experience life in microgravity
+                  Life, views, and science on the ISS
                 </p>
               </div>
             </div>

@@ -21,6 +21,12 @@ function DockingRing(props) {
   return <primitive object={scene.clone()} {...props} />
 }
 
+/* 🔹 MODELO INTERNO ESTÁTICO */
+function ModeloInterno(props) {
+  const { scene } = useGLTF('/models/modelo_interno.glb')
+  return <primitive object={scene.clone()} {...props} />
+}
+
 /* 🔹 NBL BLOCK (satellite piece) */
 function NBLBlock({ blockData, onGrab, onRelease, isGrabbed, grabPosition, isConnected, finalPosition, playerPosition }) {
   const blockRef = useRef()
@@ -322,6 +328,13 @@ export function TrainingTasks() {
     <group>
       {/* 🔥 PLAYER POSITION TRACKER */}
       <PlayerTracker onPlayerPositionUpdate={handlePlayerPositionUpdate} />
+
+      {/* 🔹 MODELO INTERNO ESTÁTICO EN LA PARTE INFERIOR */}
+      <ModeloInterno 
+        position={[-13, -7, -12]} 
+        scale={0.15}
+        rotation={[Math.PI / 2, 0, 0]}
+      />
 
       {/* Construction base - more visible platform */}
       <mesh position={[0, 0.5, -3]} castShadow receiveShadow>
