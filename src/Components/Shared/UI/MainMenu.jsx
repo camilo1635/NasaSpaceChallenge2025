@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react'
 import { useGameState } from '../../Utils/useGameState'
-import { welcomeMessage } from '../../../Data/issData'
 
 function MainMenu() {
   const { dispatch } = useGameState()
@@ -12,11 +11,14 @@ function MainMenu() {
   }, [])
   
   const handleStartGame = () => {
-    // Start directly without asking for name
-    dispatch({ type: 'SET_PLAYER_NAME', payload: 'Astronaut' })
-    dispatch({ type: 'START_GAME' })
-    dispatch({ type: 'ADD_ACHIEVEMENT', payload: 'first_visit' })
-  }
+  // Start directly without asking for name
+  dispatch({ type: 'SET_PLAYER_NAME', payload: 'Astronaut' })
+  dispatch({ type: 'START_GAME' })
+  dispatch({ type: 'ADD_ACHIEVEMENT', payload: 'first_visit' })
+  
+  // CAMBIO: Ir a character selection en lugar de ir directo al museo
+  dispatch({ type: 'SET_PHASE', payload: 'characterSelection' })
+}
   
   return (
     <div className="main-menu">

@@ -1,14 +1,16 @@
 import React, { useEffect, useState } from 'react'
 import { Canvas } from '@react-three/fiber'
-import { GameProvider } from './Components/Utils/Gamecontext'   // Provider global
-import { useGameState } from './Components/Utils/useGameState'  // Hook personalizado
+import { GameProvider } from './Components/Utils/Gamecontext'
+import { CharacterProvider } from './Components/Utils/CharacterProvider'
+import { useGameState } from './Components/Utils/useGameState'
 import MainMenu from './Components/Shared/UI/MainMenu'
+import CharacterSelection from './Components/Shared/UI/CharacterSelection'
 import MuseumScene from './Components/phase1_museum/MuseumScene'
-import {NBLScene} from './Components/phase2_NBL/NBLScene' // Importamos la nueva escena
+import { NBLScene } from './Components/phase2_NBL/NBLScene'
 import LoadingScreen from './Components/Shared/UI/LoadingScreen'
 import { ISSScene } from './Components/phase3_ISS/ISSScene'
-import { GlobalIntroVideo } from './Components/Shared/UI/GlobalIntroVideo' // Nuevo video inicial
-import { SoundManager } from './Components/Shared/Audio/SoundManager' // Sistema de audio
+import { GlobalIntroVideo } from './Components/Shared/UI/GlobalIntroVideo'
+import { SoundManager } from './Components/Shared/Audio/SoundManager'
 import './App.css'
 
 // ========================== 
@@ -18,9 +20,9 @@ function GameRenderer() {
   const { state, dispatch } = useGameState()
   
   // Estado para el video de introducción global
-  const [showGlobalIntro, setShowGlobalIntro] = useState(false) // Cambiado a false
+  const [showGlobalIntro, setShowGlobalIntro] = useState(false)
   const [globalIntroEnded, setGlobalIntroEnded] = useState(false)
-  const [gameStarted, setGameStarted] = useState(false) // Nuevo estado
+  const [gameStarted, setGameStarted] = useState(false)
   
   // Estado para manejar transición global
   const [isTransitioning, setIsTransitioning] = useState(false)
@@ -40,12 +42,12 @@ function GameRenderer() {
     setGlobalIntroEnded(true)
     setTimeout(() => {
       setShowGlobalIntro(false)
-      // Ir directamente al museo después del video
-      dispatch({ type: 'SET_PHASE', payload: 'museum' })
+      // Ir a character selection después del video
+      dispatch({ type: 'SET_PHASE', payload: 'characterSelection' })
     }, 1000)
   }
 
-  // Listener para saltar con tecla (ejemplo: "N")
+  // Listener para saltar con tecla
   useEffect(() => {
     const handleKeyDown = (e) => {
       // Skip desde museum a NBL
@@ -57,7 +59,7 @@ function GameRenderer() {
       if (e.key.toLowerCase() === 'i' && import.meta.env.DEV) {
         console.log('Skipping to ISS...')
         if (window.startGlobalTransition) {
-        window.startGlobalTransition('iss') 
+          window.startGlobalTransition('iss') 
         }
       }
       // Para desarrollo: teclas de debug
@@ -67,6 +69,11 @@ function GameRenderer() {
           console.log('Returning to menu...')
           dispatch({ type: 'SET_PHASE', payload: 'menu' })
           setIsTransitioning(false)
+        }
+        // C para character selection
+        if (e.key.toLowerCase() === 'c') {
+          console.log('Jump to Character Selection')
+          dispatch({ type: 'SET_PHASE', payload: 'characterSelection' })
         }
         // Saltos directos con números
         if (e.key === '1') {
@@ -90,7 +97,7 @@ function GameRenderer() {
 
   // Función para iniciar transición global
   const startTransitionTo = (targetPhase) => {
-    if (isTransitioning) return // Evitar múltiples transiciones
+    if (isTransitioning) return
     
     console.log(`Starting global transition to: ${targetPhase}`)
     setIsTransitioning(true)
@@ -99,7 +106,6 @@ function GameRenderer() {
 
     // TRANSICIÓN ESPECIAL: NBL -> ISS (Cohete)
     if (state.currentPhase === 'nbl' && targetPhase === 'iss') {
-      // Transición de cohete (más larga y elaborada)
       setTimeout(() => {
         console.log('Phase 2: Preparing launch')
         setTransitionPhase(2)
@@ -117,9 +123,9 @@ function GameRenderer() {
       
       setTimeout(() => {
         console.log(`Arriving at ISS`)
-        window.isTransitioningToISS = true // Flag para no mostrar intro de ISS
+        window.isTransitioningToISS = true
         dispatch({ type: 'SET_PHASE', payload: targetPhase })
-      }, 14000) // Tiempo extendido para completar animación
+      }, 14000)
       
       setTimeout(() => {
         console.log('Transition completed')
@@ -172,7 +178,7 @@ function GameRenderer() {
   // Render según la fase
   // ==========================
   const renderCurrentPhase = () => {
-    // Si se está mostrando el video intro después del menú
+    // Si se está mostrando el video intro después de character selection
     if (showGlobalIntro) {
       return (
         <div className="global-intro-video">
@@ -188,6 +194,9 @@ function GameRenderer() {
     switch (state.currentPhase) {
       case 'menu':
         return <MainMenu />
+
+      case 'characterSelection':
+        return <CharacterSelection onComplete={() => setShowGlobalIntro(true)} />
 
       case 'museum':
         return (
@@ -213,8 +222,8 @@ function GameRenderer() {
 
   return (
     <div className="game-container">
-      {/* Título del juego - No mostrar durante el menú o video inicial */}
-      {!showGlobalIntro && state.currentPhase !== 'menu' && !isTransitioning && (
+      {/* Título del juego - No mostrar durante el menú, character selection o video inicial */}
+      {!showGlobalIntro && state.currentPhase !== 'menu' && state.currentPhase !== 'characterSelection' && !isTransitioning && (
         <div className="game-title">
           <h1>ISS 25th Anniversary - Space Adventure</h1>
           <div className="phase-indicator">
@@ -228,16 +237,16 @@ function GameRenderer() {
       {/* Render de la fase actual */}
       {renderCurrentPhase()}
 
-      {/* COMPONENTE DE AUDIO - Se renderiza siempre pero internamente maneja cuándo mostrar controles */}
+      {/* COMPONENTE DE AUDIO */}
       <SoundManager />
 
-      {/* Debug info simplificado - No mostrar durante el menú o video inicial */}
-      {import.meta.env.DEV && !isTransitioning && !showGlobalIntro && state.currentPhase !== 'menu' && (
+      {/* Debug info - No mostrar durante el menú, character selection o video inicial */}
+      {import.meta.env.DEV && !isTransitioning && !showGlobalIntro && state.currentPhase !== 'menu' && state.currentPhase !== 'characterSelection' && (
         <div className="debug-info">
           <p>Phase: {state.currentPhase}</p>
           {state.currentPhase === 'museum' && <p>Press 'N' to skip to NBL</p>}
           {state.currentPhase === 'nbl' && <p>Press 'I' to skip to ISS</p>}
-          <p>Dev Keys: M= Menu | 1= Exhibition hall | 2= NBL | 3= ISS</p>
+          <p>Dev Keys: M=Menu | C=CharSelect | 1=Museum | 2=NBL | 3=ISS</p>
         </div>
       )}
 
@@ -266,7 +275,6 @@ function GameRenderer() {
             pointerEvents: 'all'
           }}>
           
-          {/* Phase 2: Launch preparation */}
           {transitionPhase === 2 && (
             <div style={{
               textAlign: 'center',
@@ -292,10 +300,8 @@ function GameRenderer() {
             </div>
           )}
 
-          {/* Phase 3: Liftoff */}
           {transitionPhase === 3 && (
             <>
-              {/* Earth at the bottom */}
               <div style={{
                 position: 'absolute',
                 bottom: '-50%',
@@ -308,7 +314,6 @@ function GameRenderer() {
                 animation: 'earthShrink 2.5s ease-in forwards'
               }} />
               
-              {/* Rocket lifting off */}
               <div style={{
                 position: 'absolute',
                 bottom: '10%',
@@ -326,7 +331,6 @@ function GameRenderer() {
                   🚀
                 </div>
                 
-                {/* Rocket flames */}
                 <div style={{
                   position: 'absolute',
                   bottom: '-30px',
@@ -338,7 +342,6 @@ function GameRenderer() {
                   🔥
                 </div>
                 
-                {/* Liftoff text */}
                 <h2 style={{
                   color: '#fff',
                   fontSize: '32px',
@@ -349,7 +352,6 @@ function GameRenderer() {
                 </h2>
               </div>
               
-              {/* Passing clouds */}
               {[...Array(5)].map((_, i) => (
                 <div
                   key={i}
@@ -369,10 +371,8 @@ function GameRenderer() {
             </>
           )}
 
-          {/* Phase 4: Space travel */}
           {transitionPhase === 4 && (
             <>
-              {/* Background stars */}
               <div style={{
                 position: 'absolute',
                 width: '100%',
@@ -397,7 +397,6 @@ function GameRenderer() {
                 ))}
               </div>
               
-              {/* Rocket in space */}
               <div style={{
                 textAlign: 'center',
                 animation: 'floatInSpace 3s ease-in-out infinite',
@@ -419,7 +418,6 @@ function GameRenderer() {
                   TRAVELING TO SPACE
                 </h2>
                 
-                {/* Speed indicator */}
                 <div style={{
                   marginTop: '20px',
                   fontSize: '24px',
@@ -429,7 +427,6 @@ function GameRenderer() {
                   Speed: 28,000 km/h
                 </div>
                 
-                {/* Progress bar */}
                 <div style={{
                   width: '300px',
                   height: '8px',
@@ -447,7 +444,6 @@ function GameRenderer() {
                 </div>
               </div>
               
-              {/* Earth moving away */}
               <div style={{
                 position: 'absolute',
                 bottom: '-80%',
@@ -465,7 +461,7 @@ function GameRenderer() {
         </div>
       )}
 
-      {/* ORIGINAL WATER TRANSITION (for other transitions) */}
+      {/* WATER TRANSITION (Museum -> NBL) */}
       {isTransitioning && pendingPhase === 'nbl' && (
         <div 
           className="game-transition water-transition"
@@ -490,7 +486,6 @@ function GameRenderer() {
             pointerEvents: 'all'
           }}>
           
-          {/* Original NBL transition content... */}
           {transitionPhase === 2 && (
             <div style={{
               textAlign: 'center',
@@ -527,7 +522,6 @@ function GameRenderer() {
             </div>
           )}
 
-          {/* Bubbles and water effects for NBL... */}
           {transitionPhase >= 3 && (
             <>
               <div style={{
@@ -609,9 +603,11 @@ function GameRenderer() {
 function App() {
   return (
     <GameProvider>
-      <div className="App">
-        <GameRenderer />
-      </div>
+      <CharacterProvider>
+        <div className="App">
+          <GameRenderer />
+        </div>
+      </CharacterProvider>
     </GameProvider>
   )
 }
