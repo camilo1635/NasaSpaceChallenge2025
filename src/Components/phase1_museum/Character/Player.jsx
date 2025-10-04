@@ -6,7 +6,7 @@ export function Player() {
   const ref = useRef()
 
   // Cargar modelo GLB
-  const { scene } = useGLTF('/models/cute_astronaut.glb')
+  const { scene } = useGLTF('/models/astronauta9.glb')
 
   return (
     <primitive 
